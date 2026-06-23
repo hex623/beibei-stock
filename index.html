@@ -193,6 +193,8 @@
           axisLine: { show: false },
           axisLabel: { color: '#606078', fontSize: 11 },
           splitLine: { lineStyle: { color: '#2a2a45', type: 'dashed' } },
+          min: function(value) { return value.min - (value.max - value.min) * 0.03; },
+          max: function(value) { return value.max + (value.max - value.min) * 0.03; },
         },
         series: [{
           type: 'line',
