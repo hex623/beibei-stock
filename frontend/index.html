@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>大盘情绪 - A股智能分析</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+  <script src="app.js"></script>
+</head>
+<body>
+  <!-- 侧边栏 -->
+  <nav class="sidebar">
+    <div class="sidebar-brand">
+      <h1>📈 智股</h1>
+      <div class="subtitle">A股智能分析工具</div>
+    </div>
+    <a href="/" class="nav-item active" data-page="sentiment">
+      <span class="nav-icon">📊</span> 大盘情绪
+    </a>
+    <a href="/sectors" class="nav-item" data-page="sectors">
+      <span class="nav-icon">🏭</span> 行业板块
+    </a>
+    <a href="/quotes" class="nav-item" data-page="quotes">
+      <span class="nav-icon">📈</span> 行情热股
+    </a>
+    <a href="/watchlist" class="nav-item" data-page="watchlist">
+      <span class="nav-icon">⭐</span> 自选股
+    </a>
+    <a href="/ai" class="nav-item" data-page="ai">
+      <span class="nav-icon">🤖</span> AI分析
+    </a>
+  </nav>
+
+  <!-- 主内容 -->
+  <main class="main-content">
+    <div class="page-header">
+      <h2>📊 大盘情绪</h2>
+      <p>基于实时行情数据的市场情绪分析 · 数据不构成投资建议</p>
+    </div>
+
+    <!-- 情绪温度 -->
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-title">🌡️ 市场情绪温度</div>
+      <div class="temperature-meter">
+        <div class="temp-value" id="tempValue">--</div>
+        <div class="temp-bar-bg">
+          <div class="temp-indicator" id="tempIndicator" style="left:50%"></div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:2px;font-size:11px;color:var(--text-muted);min-width:100px">
+          <span>❄️ 冰点 (0°)</span>
+          <span>⚖️ 中性 (50°)</span>
+          <span>🔥 狂热 (100°)</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 情绪指标卡片 -->
+    <div class="grid-4" id="sentimentCards">
+      <div class="card">
+        <div class="card-title">📈 上涨家数</div>
+        <div class="card-value up" id="upCount">--</div>
+        <div class="card-sub" id="upRatio">占比 --</div>
+      </div>
+      <div class="card">
+        <div class="card-title">📉 下跌家数</div>
+        <div class="card-value down" id="downCount">--</div>
+        <div class="card-sub" id="downRatio">占比 --</div>
+      </div>
+      <div class="card">
+        <div class="card-title">🔴 涨停</div>
+        <div class="card-value up" id="limitUp">--</div>
+        <div class="card-sub">封板率 --</div>
+      </div>
+      <div class="card">
+        <div class="card-title">🟢 跌停</div>
+        <div class="card-value down" id="limitDown">--</div>
+        <div class="card-sub">含ST --</div>
+      </div>
+      <div class="card">
+        <div class="card-title">⚖️ 涨跌比</div>
+        <div class="card-value blue" id="adRatio">--</div>
+        <div class="card-sub">上涨/下跌</div>
+      </div>
+      <div class="card">
+        <div class="card-title">💹 沪深成交额</div>
+        <div class="card-value" id="totalAmount" style="color:var(--accent-cyan)">--</div>
+        <div class="card-sub">今日累计</div>
+      </div>
+      <div class="card">
+        <div class="card-title">📋 总股票数</div>
+        <div class="card-value" id="totalStocks" style="color:var(--accent-purple)">--</div>
+        <div class="card-sub">含所有A股</div>
+      </div>
+      <div class="card">
+        <div class="card-title">🕐 更新时间</div>
+        <div class="card-value" id="updateTime" style="font-size:22px;color:var(--text-secondary)">--</div>
+        <div class="card-sub">盘中实时</div>
+      </div>
+    </div>
+
+    <!-- 指数行情 -->
+    <div class="card" style="margin-top:16px">
+      <div class="card-title">🎯 主要指数</div>
+      <div class="grid-4" id="indexCards" style="margin-top:12px"></div>
+    </div>
+
+    <!-- K线图 -->
+    <div class="card" style="margin-top:16px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <span class="card-title" style="margin-bottom:0">📉 指数走势</span>
+        <div style="display:flex;gap:8px">
+          <button class="tab-btn active" onclick="switchIndex('上证指数')">上证</button>
+          <button class="tab-btn" onclick="switchIndex('深证成指')">深证</button>
+          <button class="tab-btn" onclick="switchIndex('创业板指')">创业板</button>
+        </div>
+      </div>
+      <div id="indexChart" class="chart-container"></div>
+    </div>
+
+    <div class="update-time" id="lastUpdate">加载中...</div>
+  </main>
+
+  <script>
+    let indexChart;
+    let indexHistoryData = {};
+    let currentIndex = '上证指数';
+
+    // ======== 初始化情绪看板 ========
+    async function loadSentiment() {
+      const data = await apiGet('/market/sentiment');
+      if (data.error) {
+        document.getElementById('lastUpdate').textContent = '⚠️ 数据加载失败: ' + data.error;
+        return;
+      }
+
+      // 情绪温度
+      const temp = data.sentiment_temperature || 0;
+      document.getElementById('tempValue').textContent = temp + '°';
+      document.getElementById('tempValue').style.color =
+        temp < 30 ? 'var(--accent-green)' : temp > 70 ? 'var(--accent-red)' : 'var(--accent-yellow)';
+      document.getElementById('tempIndicator').style.left = temp + '%';
+
+      // 卡片数据
+      document.getElementById('upCount').textContent = data.up_count || 0;
+      document.getElementById('downCount').textContent = data.down_count || 0;
+      document.getElementById('limitUp').textContent = data.limit_up || 0;
+      document.getElementById('limitDown').textContent = data.limit_down || 0;
+      document.getElementById('adRatio').textContent = data.advance_decline_ratio || '—';
+      document.getElementById('totalAmount').textContent = data.total_amount || '—';
+      document.getElementById('totalStocks').textContent = data.total_stocks || 0;
+      document.getElementById('updateTime').textContent = data.updated_at || '—';
+
+      // 涨跌比例
+      const total = data.total_stocks || 1;
+      document.getElementById('upRatio').textContent =
+        `占比 ${(data.up_count / total * 100).toFixed(1)}%`;
+      document.getElementById('downRatio').textContent =
+        `占比 ${(data.down_count / total * 100).toFixed(1)}%`;
+
+      // 指数行情
+      renderIndices(data.indices);
+      document.getElementById('lastUpdate').textContent = `数据更新于 ${data.updated_at || '--'}`;
+    }
+
+    function renderIndices(indices) {
+      const container = document.getElementById('indexCards');
+      if (!indices || indices.length === 0) {
+        container.innerHTML = '<div style="color:var(--text-muted);padding:20px">暂无数据</div>';
+        return;
+      }
+      container.innerHTML = indices.map(idx => `
+        <div style="padding:12px;background:var(--bg-secondary);border-radius:var(--radius-sm)">
+          <div style="font-size:13px;color:var(--text-muted);margin-bottom:6px">${idx.name}</div>
+          <div style="font-size:22px;font-weight:700">${fmtPrice(idx.price)}</div>
+          <div class="${pctClass(idx.change_pct)}" style="font-size:14px;font-weight:600">
+            ${fmtPct(idx.change_pct)}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // ======== K线图 ========
+    async function loadIndexHistory() {
+      const data = await apiGet('/market/index-history?days=60');
+      if (data.error) return;
+      indexHistoryData = data;
+      renderChart(currentIndex);
+    }
+
+    function renderChart(name) {
+      const d = indexHistoryData[name];
+      if (!d) return;
+
+      if (!indexChart) {
+        indexChart = echarts.init(document.getElementById('indexChart'));
+        window.addEventListener('resize', () => indexChart.resize());
+      }
+
+      const option = {
+        backgroundColor: 'transparent',
+        tooltip: {
+          trigger: 'axis',
+          backgroundColor: '#1e1e35',
+          borderColor: '#2a2a45',
+          textStyle: { color: '#e8e8f0', fontSize: 12 },
+          formatter: function(params) {
+            const p = params[0];
+            return `<div style="font-weight:600;margin-bottom:4px">${p.axisValue}</div>
+                    <div>收盘: <b>${p.value.toFixed(2)}</b></div>`;
+          }
+        },
+        grid: { left: '3%', right: '3%', bottom: '8%', top: '5%', containLabel: true },
+        xAxis: {
+          type: 'category',
+          data: d.dates,
+          axisLine: { lineStyle: { color: '#2a2a45' } },
+          axisLabel: { color: '#606078', fontSize: 11 },
+          splitLine: { show: false },
+        },
+        yAxis: {
+          type: 'value',
+          axisLine: { show: false },
+          axisLabel: { color: '#606078', fontSize: 11 },
+          splitLine: { lineStyle: { color: '#2a2a45', type: 'dashed' } },
+        },
+        series: [{
+          type: 'line',
+          data: d.close,
+          smooth: true,
+          showSymbol: false,
+          lineStyle: { width: 2, color: '#4f8cff' },
+          areaStyle: {
+            color: {
+              type: 'linear', x: 0, y: 0, x2: 0, y2: 1,
+              colorStops: [
+                { offset: 0, color: 'rgba(79,140,255,0.3)' },
+                { offset: 1, color: 'rgba(79,140,255,0.02)' }
+              ]
+            }
+          },
+          markLine: {
+            silent: true,
+            data: [{ type: 'average', name: '均值' }],
+            lineStyle: { color: '#606078', type: 'dashed' },
+            label: { color: '#606078', fontSize: 11, formatter: '均值 {value}' }
+          }
+        }],
+        dataZoom: [{
+          type: 'inside',
+          start: 70,
+          end: 100
+        }]
+      };
+
+      indexChart.setOption(option, true);
+    }
+
+    function switchIndex(name) {
+      currentIndex = name;
+      document.querySelectorAll('.tab-btn').forEach((btn, i) => {
+        btn.classList.toggle('active', ['上证指数','深证成指','创业板指'][i] === name);
+      });
+      renderChart(name);
+    }
+
+    // ======== 自动刷新 ========
+    async function init() {
+      await loadSentiment();
+      await loadIndexHistory();
+      // 每60秒刷新情绪数据
+      setInterval(loadSentiment, 60000);
+    }
+
+    init();
+  </script>
+</body>
+</html>
