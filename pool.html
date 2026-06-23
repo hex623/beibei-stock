@@ -276,25 +276,25 @@
     }
     .top-tabs a:hover { color: var(--text-primary); background: rgba(255,255,255,0.05); }
     .top-tabs a.active { color: var(--text-primary); background: var(--bg-elevated); }
+
+    /* Section quick nav */
+    .pool-nav-bar {
+      display: flex; gap: 12px; padding: 16px 0; flex-wrap: wrap;
+      border-bottom: 1px solid var(--border-subtle); margin-bottom: 32px;
+    }
+    .pool-nav-link {
+      padding: 8px 20px; border-radius: 8px; font-size: 14px; font-weight: 500;
+      color: var(--text-muted); text-decoration: none; transition: all 0.2s;
+      border: 1px solid var(--border-standard);
+    }
+    .pool-nav-link:hover { color: var(--text-primary); border-color: var(--accent); }
+
+    .pool-page .filters {
+      display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px;
+    }
   </style>
 </head>
 <body class="pool-page">
-    .stock-card:nth-child(3) { animation-delay: 0.10s; }
-    .stock-card:nth-child(4) { animation-delay: 0.15s; }
-    .stock-card:nth-child(5) { animation-delay: 0.20s; }
-    .stock-card:nth-child(6) { animation-delay: 0.25s; }
-    .stock-card:nth-child(7) { animation-delay: 0.30s; }
-    .stock-card:nth-child(8) { animation-delay: 0.35s; }
-    .stock-card:nth-child(9) { animation-delay: 0.40s; }
-    .stock-card:nth-child(10) { animation-delay: 0.45s; }
-    .stock-card:nth-child(11) { animation-delay: 0.50s; }
-    .stock-card:nth-child(12) { animation-delay: 0.55s; }
-    .stock-card:nth-child(13) { animation-delay: 0.60s; }
-    .stock-card:nth-child(14) { animation-delay: 0.65s; }
-    .stock-card:nth-child(15) { animation-delay: 0.70s; }
-  </style>
-</head>
-<body>
   <!-- Shared top nav -->
   <div class="top-bar">
     <div class="top-bar-brand">
@@ -338,6 +338,16 @@
       </div>
     </div>
   </section>
+
+  <!-- Section quick nav -->
+  <div class="main">
+    <div class="pool-nav-bar">
+      <a href="#deep" class="pool-nav-link">深度跟踪池</a>
+      <a href="#regular" class="pool-nav-link">常规覆盖池</a>
+      <a href="#observe" class="pool-nav-link">观察池</a>
+      <a href="#rules" class="pool-nav-link">筛选规则</a>
+    </div>
+  </div>
 
   <main class="main">
     <!-- Deep Track Pool -->
