@@ -3,42 +3,21 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>大盘情绪 - A股智能分析</title>
+  <title>beibei stock - 大盘情绪</title>
   <link rel="stylesheet" href="style.css">
   <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
   <script src="app.js"></script>
 </head>
 <body>
-  <!-- 侧边栏 -->
-  <nav class="sidebar">
-    <div class="sidebar-brand">
-      <h1>📈 智股</h1>
-      <div class="subtitle">A股智能分析工具</div>
+  <div class="top-bar">
+    <div class="top-bar-brand">
+      <h1>beibei stock</h1>
+      <span class="top-bar-sub">大盘情绪</span>
     </div>
-    <a href="/" class="nav-item active" data-page="sentiment">
-      <span class="nav-icon">📊</span> 大盘情绪
-    </a>
-    <a href="/sectors" class="nav-item" data-page="sectors">
-      <span class="nav-icon">🏭</span> 行业板块
-    </a>
-    <a href="/quotes" class="nav-item" data-page="quotes">
-      <span class="nav-icon">📈</span> 行情热股
-    </a>
-    <a href="/watchlist" class="nav-item" data-page="watchlist">
-      <span class="nav-icon">⭐</span> 自选股
-    </a>
-    <a href="/ai" class="nav-item" data-page="ai">
-      <span class="nav-icon">🤖</span> AI分析
-    </a>
-  </nav>
+    <div class="top-bar-time" id="updateTime">--</div>
+  </div>
 
-  <!-- 主内容 -->
-  <main class="main-content">
-    <div class="page-header">
-      <h2>📊 大盘情绪</h2>
-      <p>基于实时行情数据的市场情绪分析 · 数据不构成投资建议</p>
-    </div>
-
+  <main class="main-content" style="margin-left:0;padding-top:80px">
     <!-- 情绪温度 -->
     <div class="card" style="margin-bottom:16px">
       <div class="card-title">🌡️ 市场情绪温度</div>
@@ -55,7 +34,8 @@
       </div>
     </div>
 
-    <div class="grid-4" id="sentimentCards">
+    <!-- 指标卡片 -->
+    <div class="grid-4" style="margin-bottom:16px">
       <div class="card">
         <div class="card-title">📈 上涨家数</div>
         <div class="card-value up" id="upCount">--</div>
@@ -92,18 +72,20 @@
         <div class="card-sub">含所有A股</div>
       </div>
       <div class="card">
-        <div class="card-title">🕐 更新时间</div>
-        <div class="card-value" id="updateTime" style="font-size:22px;color:var(--text-secondary)">--</div>
-        <div class="card-sub">盘中实时</div>
+        <div class="card-title">🕐 数据时间</div>
+        <div class="card-value" id="dataTime" style="font-size:20px;color:var(--text-secondary)">--</div>
+        <div class="card-sub">GitHub Actions定时更新</div>
       </div>
     </div>
 
-    <div class="card" style="margin-top:16px">
+    <!-- 指数行情 -->
+    <div class="card" style="margin-bottom:16px">
       <div class="card-title">🎯 主要指数</div>
       <div class="grid-4" id="indexCards" style="margin-top:12px"></div>
     </div>
 
-    <div class="card" style="margin-top:16px">
+    <!-- K线图 -->
+    <div class="card" style="margin-bottom:16px">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
         <span class="card-title" style="margin-bottom:0">📉 指数走势</span>
         <div style="display:flex;gap:8px">
@@ -123,7 +105,6 @@
     let indexHistoryData = {};
     let currentIndex = '上证指数';
 
-    // ======== 初始化情绪看板 ========
     async function loadSentiment() {
       const data = await loadJSON('sentiment.json');
       if (!data || data.error) {
@@ -144,13 +125,12 @@
       document.getElementById('adRatio').textContent = data.advance_decline_ratio || '—';
       document.getElementById('totalAmount').textContent = data.total_amount || '—';
       document.getElementById('totalStocks').textContent = data.total_stocks || 0;
-      document.getElementById('updateTime').textContent = data.updated_at || '—';
+      document.getElementById('dataTime').textContent = data.updated_at || '—';
+      document.getElementById('updateTime').textContent = `更新于 ${data.updated_at || '--'}`;
 
       const total = data.total_stocks || 1;
-      document.getElementById('upRatio').textContent =
-        `占比 ${(data.up_count / total * 100).toFixed(1)}%`;
-      document.getElementById('downRatio').textContent =
-        `占比 ${(data.down_count / total * 100).toFixed(1)}%`;
+      document.getElementById('upRatio').textContent = `占比 ${(data.up_count / total * 100).toFixed(1)}%`;
+      document.getElementById('downRatio').textContent = `占比 ${(data.down_count / total * 100).toFixed(1)}%`;
 
       renderIndices(data.indices);
       document.getElementById('lastUpdate').textContent = `数据更新于 ${data.updated_at || '--'}`;
@@ -166,9 +146,7 @@
         <div style="padding:12px;background:var(--bg-secondary);border-radius:var(--radius-sm)">
           <div style="font-size:13px;color:var(--text-muted);margin-bottom:6px">${idx.name}</div>
           <div style="font-size:22px;font-weight:700">${fmtPrice(idx.price)}</div>
-          <div class="${pctClass(idx.change_pct)}" style="font-size:14px;font-weight:600">
-            ${fmtPct(idx.change_pct)}
-          </div>
+          <div class="${pctClass(idx.change_pct)}" style="font-size:14px;font-weight:600">${fmtPct(idx.change_pct)}</div>
         </div>
       `).join('');
     }
@@ -238,11 +216,7 @@
             label: { color: '#606078', fontSize: 11, formatter: '均值 {value}' }
           }
         }],
-        dataZoom: [{
-          type: 'inside',
-          start: 70,
-          end: 100
-        }]
+        dataZoom: [{ type: 'inside', start: 70, end: 100 }]
       };
 
       indexChart.setOption(option, true);

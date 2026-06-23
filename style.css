@@ -19,6 +19,46 @@
   --radius-sm: 8px;
 }
 
+/* 顶栏（替代侧边栏） */
+.top-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  z-index: 100;
+}
+.top-bar-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.top-bar-brand h1 {
+  font-size: 20px;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.top-bar-sub {
+  font-size: 13px;
+  color: var(--text-secondary);
+  padding-left: 12px;
+  border-left: 1px solid var(--border-color);
+}
+.top-bar-time {
+  font-size: 13px;
+  color: var(--text-muted);
+  font-family: monospace;
+}
+
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
