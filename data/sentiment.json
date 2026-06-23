@@ -1,12 +1,12 @@
 {
-  "sentiment_temperature": 25,
+  "sentiment_temperature": 78,
   "total_stocks": 5300,
-  "up_count": 1200,
-  "down_count": 4100,
-  "flat_count": 530,
-  "limit_up": 132,
-  "limit_down": 1104,
-  "advance_decline_ratio": 0.29,
+  "up_count": 3700,
+  "down_count": 1600,
+  "flat_count": 0,
+  "limit_up": 105,
+  "limit_down": 3,
+  "advance_decline_ratio": 2.31,
   "total_amount": "34408亿",
   "indices": [
     {

@@ -205,17 +205,37 @@ def _fetch_all_market_pages(params, max_retries=3):
 
 
 def fetch_sentiment(indices):
-    """市场情绪 — 三层降级策略"""
+    """市场情绪 — 优先实时数据，API不可用则保留上日真实数据"""
     print("Fetching sentiment...")
-    total_stocks = 5300
     today = time.strftime("%Y-%m-%d")
 
-    # ===== 第1层：按涨跌幅排序取前2页（涨停/跌停通常<100家，一页搞定）=====
-    print("  Tier 1: sorted by change% (desc/asc)...")
-    limit_up, _ = _count_limits_sorted("desc", 9.8)
-    limit_down, _ = _count_limits_sorted("asc", 9.8)
-    print(f"    Sorted OK: 涨停={limit_up}, 跌停={limit_down}")
-    # 涨跌家数用第一页取比例推算
+    # 从 market_history 取上日真实数据做兜底
+    last_real = None
+    mh_path = os.path.join(DATA_DIR, "market_history.json")
+    if os.path.exists(mh_path):
+        try:
+            with open(mh_path) as f:
+                hist = json.load(f)
+            for h in reversed(hist):
+                if h["date"] != today and h["limit_up"] is not None:
+                    last_real = h
+                    break
+        except:
+            pass
+
+    total_stocks = last_real.get("total_stocks", 5300) if last_real else 5300
+
+    # ===== 尝试获取实时数据 =====
+    limit_up, limit_down = None, None
+    up_count_extrapolated, down_count_extrapolated = None, None
+    ratio = "—"
+
+    # 1) 按涨跌幅排序精确统计涨停/跌停
+    limit_up, up_ok = _count_limits_sorted("desc", 9.8)
+    limit_down, down_ok = _count_limits_sorted("asc", 9.8)
+    got_limits = up_ok and down_ok
+
+    # 2) 涨跌家数
     params = {
         "pn": 1, "pz": 100, "po": 0, "np": 1,
         "ut": "bd1d9ddb04089700cf9c27f6f7426281",
@@ -224,78 +244,48 @@ def fetch_sentiment(indices):
         "fields": "f2,f3,f4,f5,f6,f12,f14",
     }
     data = _em_get(params)
-    if data and data.get("data", {}).get("diff"):
-        total_stocks = data["data"].get("total", 5300)
+    got_updown = bool(data and data.get("data", {}).get("diff"))
+
+    if got_limits and got_updown:
+        # ✅ 双丰收：涨停/跌停 + 涨跌家数都有实时数据
         items = data["data"]["diff"]
-        up_count = sum(1 for r in items if _sf(r.get("f3")) > 0)
-        down_count = sum(1 for r in items if _sf(r.get("f3")) < 0)
+        total_stocks = data["data"].get("total", 5300)
+        up = sum(1 for r in items if _sf(r.get("f3")) > 0)
+        dn = sum(1 for r in items if _sf(r.get("f3")) < 0)
         sampled = len(items)
-        up_ratio = up_count / sampled if sampled > 0 else 0.5
-        ratio = round(up_count / down_count, 2) if down_count > 0 else "—"
+        up_ratio = up / sampled if sampled > 0 else 0.5
+        ratio = round(up / dn, 2) if dn > 0 else "—"
         up_count_extrapolated = round(total_stocks * up_ratio)
         down_count_extrapolated = total_stocks - up_count_extrapolated
-    else:
-        up_count_extrapolated = round(total_stocks * 0.45)
-        down_count_extrapolated = round(total_stocks * 0.45)
-        ratio = "—"
-        print("  Tier 2: full market scan...")
-        params = {
-            "pn": 1, "pz": 100, "po": 0, "np": 1,
-            "ut": "bd1d9ddb04089700cf9c27f6f7426281",
-            "fltt": 2, "invt": 2, "fid": "f12",
-            "fs": "m:0+t:6,m:0+t:80,m:1+t:2,m:1+t:23,m:0+t:81+s:2048",
-            "fields": "f2,f3,f4,f5,f6,f12,f14",
+        print(f"  Live data OK: 涨停={limit_up}, 跌停={limit_down}, 涨={up_count_extrapolated}, 跌={down_count_extrapolated}")
+    elif got_limits:
+        # 只有涨停/跌停，涨跌家数用上日数据
+        print(f"  Limited live data: 涨停={limit_up}, 跌停={limit_down}, 涨跌家数用上日")
+        up_count_extrapolated = last_real["up_count"] if last_real else round(total_stocks * 0.45)
+        down_count_extrapolated = last_real["down_count"] if last_real else round(total_stocks * 0.45)
+        ratio = round(up_count_extrapolated / down_count_extrapolated, 2) if down_count_extrapolated > 0 else "—"
+    elif last_real:
+        # ❌ 全挂，用上日真实数据
+        print(f"  All APIs down, using last real data ({last_real['date']})")
+        return {
+            "sentiment_temperature": last_real.get("temperature", 50),
+            "total_stocks": total_stocks,
+            "up_count": last_real["up_count"],
+            "down_count": last_real["down_count"],
+            "flat_count": max(0, total_stocks - last_real["up_count"] - last_real["down_count"]),
+            "limit_up": last_real["limit_up"],
+            "limit_down": last_real["limit_down"],
+            "advance_decline_ratio": round(last_real["up_count"] / last_real["down_count"], 2) if last_real["down_count"] > 0 else "—",
+            "total_amount": "—",
+            "board_height": "—",
+            "indices": indices or [],
+            "updated_at": time.strftime("%Y-%m-%d %H:%M:%S"),
+            "note": f"数据源于{last_real['date']}（实时数据不可用）",
         }
-        all_items, total_stocks = _fetch_all_market_pages(params)
-        if all_items and len(all_items) > 0:
-            up_count = sum(1 for r in all_items if _sf(r.get("f3")) > 0)
-            down_count = sum(1 for r in all_items if _sf(r.get("f3")) < 0)
-            limit_up = sum(1 for r in all_items if _sf(r.get("f3")) >= 9.8)
-            limit_down = sum(1 for r in all_items if _sf(r.get("f3")) <= -9.8)
-            sampled = len(all_items)
-            up_ratio = up_count / sampled if sampled > 0 else 0.5
-            ratio = round(up_count / down_count, 2) if down_count > 0 else "—"
-            up_count_extrapolated = round(total_stocks * up_ratio)
-            down_count_extrapolated = total_stocks - up_count_extrapolated
-            print(f"    Full scan result: 涨={up_count_extrapolated}, 跌={down_count_extrapolated}, 涨停={limit_up}, 跌停={limit_down}")
-        else:
-            # ===== 第3层：抽样+等比放大（最快，近似准确）=====
-            print("  Tier 3: sampling + extrapolation...")
-            params = {
-                "pn": 1, "pz": 100, "po": 0, "np": 1,
-                "ut": "bd1d9ddb04089700cf9c27f6f7426281",
-                "fltt": 2, "invt": 2, "fid": "f12",
-                "fs": "m:0+t:6,m:0+t:80,m:1+t:2,m:1+t:23,m:0+t:81+s:2048",
-                "fields": "f2,f3,f4,f5,f6,f12,f14",
-            }
-            data = _em_get(params)
-            if not data or not data.get("data", {}).get("diff"):
-                print("  -> All APIs failed, keeping existing data")
-                return None
-            total_stocks = data["data"].get("total", 5300)
-            all_items = list(data["data"]["diff"])
-            per_page = len(all_items)
-            total_pages = max(1, math.ceil(total_stocks / per_page))
-            for page in [2, 3, total_pages - 2, total_pages - 1, total_pages]:
-                if page > 1 and page <= total_pages:
-                    p = dict(params, pn=page)
-                    d = _em_get(p)
-                    if d and d.get("data", {}).get("diff"):
-                        all_items.extend(d["data"]["diff"])
-                    time.sleep(0.5)
-            up_count = sum(1 for r in all_items if _sf(r.get("f3")) > 0)
-            down_count = sum(1 for r in all_items if _sf(r.get("f3")) < 0)
-            sampled = len(all_items)
-            limit_up = sum(1 for r in all_items if _sf(r.get("f3")) >= 9.8)
-            limit_down = sum(1 for r in all_items if _sf(r.get("f3")) <= -9.8)
-            up_ratio = up_count / sampled if sampled > 0 else 0.5
-            ratio = round(up_count / down_count, 2) if down_count > 0 else "—"
-            scale = total_stocks / sampled if sampled > 0 else 1
-            limit_up = round(limit_up * scale)
-            limit_down = round(limit_down * scale)
-            up_count_extrapolated = round(total_stocks * up_ratio)
-            down_count_extrapolated = total_stocks - up_count_extrapolated
-            print(f"    Sample result: 涨={up_count_extrapolated}, 跌={down_count_extrapolated}, 涨停={limit_up}, 跌停={limit_down}")
+    else:
+        # 无历史数据也无实时数据
+        print("  No data available at all, returning None")
+        return None
 
     # 成交额取沪深之和（上证+深证）
     total_amount_str = "—"
