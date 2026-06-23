@@ -34,5 +34,13 @@
     "up_count": 3700,
     "down_count": 1600,
     "board_height": "5板"
+  },
+  {
+    "date": "2026-06-23",
+    "temperature": 78,
+    "limit_up": 105,
+    "limit_down": 3,
+    "up_count": 3700,
+    "down_count": 1600
   }
 ]

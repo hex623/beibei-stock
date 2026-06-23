@@ -7,7 +7,8 @@
   "limit_up": 105,
   "limit_down": 3,
   "advance_decline_ratio": 2.31,
-  "total_amount": "34408亿",
+  "total_amount": "—",
+  "board_height": "—",
   "indices": [
     {
       "name": "上证指数",
@@ -98,6 +99,6 @@
       "low": 8626.1
     }
   ],
-  "updated_at": "2026-06-23 15:28:59",
-  "board_height": "—"
+  "updated_at": "2026-06-23 09:53:43",
+  "note": "数据源于2026-06-22（实时数据不可用）"
 }
