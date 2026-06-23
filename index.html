@@ -98,6 +98,14 @@
       </div>
     </div>
 
+    <!-- 量价分析·今日盘面 -->
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-title">📊 量价分析·今日盘面</div>
+      <div id="volumePriceAnalysis" style="padding:8px 0">
+        <div style="text-align:center;color:var(--text-muted);padding:20px">加载中...</div>
+      </div>
+    </div>
+
     <!-- 图表区域: 2x2 -->
     <div class="grid-2" style="margin-bottom:16px;gap:16px">
       <!-- 大盘成交额趋势 -->
@@ -504,7 +512,95 @@
       loadIndexChangeChart();
       await loadIndexHistory();
       setInterval(loadSentiment, 300000);
+      loadVolumePriceAnalysis();
       loadVisitorCount();
+    }
+
+    // 量价分析
+    async function loadVolumePriceAnalysis() {
+      const turnoverData = await loadJSON('turnover_history.json');
+      const indicesData = await loadJSON('indices.json');
+      const marketData = await loadJSON('market_history.json');
+      const container = document.getElementById('volumePriceAnalysis');
+      if (!turnoverData || turnoverData.length < 5 || !indicesData) {
+        container.innerHTML = '<div style="text-align:center;color:var(--text-muted);padding:12px">数据不足</div>';
+        return;
+      }
+
+      const recent = turnoverData.slice(-6);
+      const today = recent[recent.length - 1];
+      const prev5 = recent.slice(0, 5);
+      const avg5 = prev5.reduce((s, d) => s + d.amount, 0) / prev5.length;
+      const todayAmt = today.amount;
+      const volRatio = todayAmt / avg5;
+      const volChange = ((volRatio - 1) * 100).toFixed(1);
+      const isUpVol = volRatio > 1.05;
+      const isDownVol = volRatio < 0.95;
+
+      // 今日多空数据（从market_history获取）
+      const todayMarket = marketData && marketData.length > 0 ? marketData[marketData.length - 1] : null;
+
+      // 各指数量价分析（用全市场量比做参考）
+      const indexAnalysis = indicesData.map(idx => {
+        const change = idx.change_pct || 0;
+        const isUp = change >= 0;
+        let status, color, icon;
+        if (isUp && isUpVol) { status = '放量上涨'; color = '#ff4d4f'; icon = '🔴'; }
+        else if (isUp && !isUpVol && !isDownVol) { status = '平量上涨'; color = '#ff9f43'; icon = '🟠'; }
+        else if (isUp && isDownVol) { status = '缩量上涨'; color = '#ffc107'; icon = '🟡'; }
+        else if (!isUp && isUpVol) { status = '放量下跌'; color = '#4fc3a1'; icon = '🟢'; }
+        else if (!isUp && !isUpVol && !isDownVol) { status = '平量下跌'; color = '#66bb6a'; icon = '🟢'; }
+        else { status = '缩量下跌'; color = '#4fc3a1'; icon = '🟢'; }
+        return { name: idx.name, change, amount: idx.amount || '—', status, color, icon };
+      });
+
+      // 综合研判
+      let verdict, verdictColor;
+      const downIndices = indexAnalysis.filter(i => i.change < 0).length;
+      const isAllDown = downIndices >= 6;
+      if (isAllDown && isUpVol) { verdict = '⚠️ 全线放量下跌，短期调整压力大，建议观望'; verdictColor = '#ff4d4f'; }
+      else if (isAllDown && !isUpVol) { verdict = '🔵 全线缩量调整，抛压减轻，关注企稳信号'; verdictColor = '#4fc3a1'; }
+      else if (!isAllDown && isUpVol) { verdict = '🔥 市场放量活跃，关注方向选择'; verdictColor = '#ffc107'; }
+      else { verdict = '📊 市场缩量整理，等待方向'; verdictColor = '#9090a8'; }
+
+      const volDir = isUpVol ? '放量' : isDownVol ? '缩量' : '平量';
+      const volDirIcon = isUpVol ? '🔥' : isDownVol ? '💧' : '⚖️';
+
+      container.innerHTML = `
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:12px">
+          <div style="background:var(--bg-secondary);border-radius:var(--radius-sm);padding:16px;text-align:center">
+            <div style="font-size:12px;color:var(--text-muted);margin-bottom:6px">沪深成交额</div>
+            <div style="font-size:24px;font-weight:700;color:var(--accent-cyan)">${(todayAmt/1e8).toFixed(0)}亿</div>
+            <div style="font-size:13px;color:${isUpVol ? 'var(--accent-red)' : 'var(--accent-green)'};margin-top:4px">
+              ${volDirIcon} 较5日均量 ${volChange > 0 ? '+' : ''}${volChange}%
+            </div>
+          </div>
+          <div style="background:var(--bg-secondary);border-radius:var(--radius-sm);padding:16px;text-align:center">
+            <div style="font-size:12px;color:var(--text-muted);margin-bottom:6px">多空对比</div>
+            <div style="font-size:24px;font-weight:700">
+              <span style="color:var(--accent-red)">↑${todayMarket ? todayMarket.up_count : '--'}</span>
+              <span style="color:var(--text-muted);margin:0 4px">/</span>
+              <span style="color:var(--accent-green)">↓${todayMarket ? todayMarket.down_count : '--'}</span>
+            </div>
+            <div style="font-size:13px;color:var(--text-muted);margin-top:4px">
+              ${volDir} · ${isAllDown ? '普跌格局' : '涨跌分化'}
+            </div>
+          </div>
+          <div style="background:var(--bg-secondary);border-radius:var(--radius-sm);padding:16px;text-align:center">
+            <div style="font-size:12px;color:var(--text-muted);margin-bottom:6px">综合研判</div>
+            <div style="font-size:14px;font-weight:600;color:${verdictColor};line-height:1.5">${verdict}</div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
+          ${indexAnalysis.map(idx => `
+            <div style="background:var(--bg-secondary);border-radius:var(--radius-sm);padding:10px;text-align:center">
+              <div style="font-size:12px;color:var(--text-muted);margin-bottom:4px">${idx.name.replace('指数','')}</div>
+              <div style="font-size:16px;font-weight:700;color:${idx.change >= 0 ? 'var(--accent-red)' : 'var(--accent-green)'}">${idx.change > 0 ? '+' : ''}${idx.change.toFixed(2)}%</div>
+              <div style="font-size:11px;color:${idx.color};margin-top:2px">${idx.icon} ${idx.status}</div>
+            </div>
+          `).join('')}
+        </div>
+      `;
     }
 
     // 访问量计数
