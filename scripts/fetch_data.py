@@ -9,7 +9,7 @@ from urllib.parse import urlencode
 DATA_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data")
 
 
-def _fetch(url, params=None, timeout=20, headers=None):
+def _fetch(url, params=None, timeout=10, headers=None):
     """通用 HTTP GET 请求"""
     if params:
         url = f"{url}?{urlencode(params)}"
@@ -37,15 +37,16 @@ def _fetch_json(url, params=None):
     return {"rc": -1, "data": None}
 
 
-def _em_get(params, timeout=20):
-    """East Money API 请求（带重试）"""
-    url = "https://82.push2.eastmoney.com/api/qt/clist/get"
-    for attempt in range(3):
+def _em_get(params, timeout=8):
+    """East Money API 请求（带重试和备用域名）"""
+    urls = [
+        "https://push2.eastmoney.com/api/qt/clist/get",
+        "https://push2ex.eastmoney.com/api/qt/clist/get",
+    ]
+    for url in urls:
         data = _fetch_json(url, params)
         if data and data.get("rc") == 0:
             return data
-        print(f"  EM retry {attempt+1}...")
-        time.sleep(2 + random.random() * 2)
     return None
 
 
@@ -204,7 +205,8 @@ def fetch_sectors():
         "fs": "m:90+t:2",
         "fields": "f2,f3,f4,f5,f6,f12,f14,f104,f105,f136",
     })
-    if not data.get("data", {}).get("diff"):
+    if not data or not data.get("data", {}).get("diff"):
+        print("  -> no data, returning empty")
         return []
     records = []
     for item in data["data"]["diff"]:
@@ -232,7 +234,7 @@ def fetch_hot_stocks():
         "fs": "m:0+t:6,m:0+t:80,m:1+t:2,m:1+t:23,m:0+t:81+s:2048",
         "fields": "f2,f3,f4,f5,f6,f8,f9,f12,f14,f20",
     })
-    if not data.get("data", {}).get("diff"):
+    if not data or not data.get("data", {}).get("diff"):
         return []
     records = []
     for item in data["data"]["diff"]:
@@ -253,6 +255,7 @@ def fetch_index_history():
     """K线历史（含成交额）"""
     print("Fetching index history...")
     result = {}
+    # 先用 East Money
     for name, em_id in [
         ("上证指数", "1.000001"),
         ("深证成指", "0.399001"),
@@ -264,29 +267,66 @@ def fetch_index_history():
             f"&ut=fa5fd1943c7b386f172d6893dbfd32bb"
             f"&fields1=f1,f2,f3,f4,f5,f6"
             f"&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61"
-            f"&klt=101&fqt=1&end=20500101&lmt=120"
+            f"&klt=101&fqt=1&end=20500101&lmt=60"
         )
-        if not raw:
-            continue
-        try:
-            data = json.loads(raw.decode("utf-8"))
-            klines = data.get("data", {}).get("klines", [])
-            dates, closes, opens, highs, lows, amounts = [], [], [], [], [], []
-            for line in klines:
-                parts = line.split(",")
-                dates.append(parts[0])
-                closes.append(float(parts[2]))
-                opens.append(float(parts[1]))
-                highs.append(float(parts[3]))
-                lows.append(float(parts[4]))
-                amounts.append(float(parts[6]) if len(parts) > 6 else 0)
-            result[name] = {
-                "dates": dates, "close": closes, "open": opens,
-                "high": highs, "low": lows, "amount": amounts
-            }
-        except Exception as e:
-            print(f"  parse error for {name}: {e}")
-            continue
+        if raw:
+            try:
+                data = json.loads(raw.decode("utf-8"))
+                klines = data.get("data", {}).get("klines", [])
+                dates, closes, opens, highs, lows, amounts = [], [], [], [], [], []
+                for line in klines:
+                    parts = line.split(",")
+                    dates.append(parts[0])
+                    closes.append(float(parts[2]))
+                    opens.append(float(parts[1]))
+                    highs.append(float(parts[3]))
+                    lows.append(float(parts[4]))
+                    amounts.append(float(parts[6]) if len(parts) > 6 else 0)
+                result[name] = {
+                    "dates": dates, "close": closes, "open": opens,
+                    "high": highs, "low": lows, "amount": amounts
+                }
+                continue
+            except:
+                pass
+        # Fallback: 腾讯行情
+        tencodes = {"上证指数": "sh000001", "深证成指": "sz399001", "创业板指": "sz399006"}
+        tc = tencodes.get(name)
+        if tc:
+            raw = _fetch(f"http://web.ifzq.gtimg.cn/appstock/app/kline/mkline?param={tc},day,,60")
+            if raw:
+                try:
+                    text = raw.decode("utf-8")
+                    # JSONP wrapper
+                    if "=" in text:
+                        text = text[text.index("=")+1:text.rindex(")")] if text.endswith(")") else text[text.index("=")+1:]
+                    data = json.loads(text)
+                    klines = data.get("data", {}).get(tc, {}).get("day", []) or \
+                             data.get("data", {}).get(tc, {}).get("klines", []) or \
+                             data.get("data", {}).get("klines", [])
+                    dates, closes, opens, highs, lows, amounts = [], [], [], [], [], []
+                    for k in klines:
+                        if isinstance(k, str):
+                            parts = k.split(" ")
+                            if len(parts) >= 7:
+                                dates.append(parts[0])
+                                opens.append(float(parts[1]))
+                                closes.append(float(parts[2]))
+                                highs.append(float(parts[3]))
+                                lows.append(float(parts[4]))
+                                amounts.append(float(parts[5]))
+                        elif isinstance(k, list) and len(k) >= 7:
+                            dates.append(k[0])
+                            opens.append(float(k[1]))
+                            closes.append(float(k[2]))
+                            highs.append(float(k[3]))
+                            lows.append(float(k[4]))
+                            amounts.append(float(k[5]))
+                    if dates:
+                        result[name] = {"dates": dates, "close": closes, "open": opens,
+                                        "high": highs, "low": lows, "amount": amounts}
+                except:
+                    pass
     print(f"  -> {len(result)} indices history")
     return result
 
@@ -294,36 +334,57 @@ def fetch_index_history():
 def fetch_turnover_history():
     """两市成交额历史 — 上证+深证日成交额之和"""
     print("Fetching turnover history...")
-    # Fetch SSE + SZSE kline amounts
-    sh_map, sz_map = {}, {}
-    for name, em_id, store in [
-        ("上证指数", "1.000001", sh_map),
-        ("深证成指", "0.399001", sz_map),
-    ]:
-        raw = _fetch(
-            f"https://push2his.eastmoney.com/api/qt/stock/kline/get"
-            f"?secid={em_id}"
-            f"&ut=fa5fd1943c7b386f172d6893dbfd32bb"
-            f"&fields1=f1,f2,f3,f4,f5,f6"
-            f"&fields2=f51,f57"
-            f"&klt=101&fqt=1&end=20500101&lmt=120"
-        )
-        if not raw:
-            continue
+    # 先从 index_history.json 已缓存的 amount 中提取
+    index_path = os.path.join(DATA_DIR, "index_history.json")
+    if os.path.exists(index_path):
         try:
-            data = json.loads(raw.decode("utf-8"))
-            for line in data.get("data", {}).get("klines", []):
-                parts = line.split(",")
-                store[parts[0]] = float(parts[1]) if len(parts) > 1 else 0
+            with open(index_path) as f:
+                idx_data = json.load(f)
+            sh = idx_data.get("上证指数", {})
+            sz = idx_data.get("深证成指", {})
+            if sh.get("dates") and sh.get("amount"):
+                result = []
+                dates = sh["dates"]
+                sh_amts = sh["amount"]
+                sz_amts = sz.get("amount", [0]*len(dates))
+                for i, d in enumerate(dates):
+                    total = (sh_amts[i] if i < len(sh_amts) else 0) + \
+                            (sz_amts[i] if i < len(sz_amts) else 0)
+                    result.append({"date": d, "amount": round(total, 2)})
+                print(f"  -> {len(result)} days from cached index data")
+                return result
         except:
-            continue
+            pass
+
+    # 直接从腾讯行情获取
+    sh_map, sz_map = {}, {}
+    for name, tencode in [("上证指数", "sh000001"), ("深证成指", "sz399001")]:
+        raw = _fetch(f"http://web.ifzq.gtimg.cn/appstock/app/kline/mkline?param={tencode},day,,60")
+        if raw:
+            try:
+                text = raw.decode("utf-8")
+                if "=" in text:
+                    text = text[text.index("=")+1:text.rindex(")")] if text.endswith(")") else text[text.index("=")+1:]
+                data = json.loads(text)
+                klines = data.get("data", {}).get(tencode, {}).get("day", []) or data.get("data", {}).get("klines", [])
+                for k in klines:
+                    if isinstance(k, str):
+                        parts = k.split(" ")
+                        if len(parts) >= 7:
+                            sh_map[parts[0]] = float(parts[5]) if name == "上证指数" else 0
+                            if name == "深证成指":
+                                sz_map[parts[0]] = float(parts[5])
+                    elif isinstance(k, list) and len(k) >= 7:
+                        (sh_map if name == "上证指数" else sz_map)[k[0]] = float(k[5])
+            except:
+                continue
 
     all_dates = sorted(set(list(sh_map.keys()) + list(sz_map.keys())))
     result = []
     for d in all_dates:
         total = sh_map.get(d, 0) + sz_map.get(d, 0)
         result.append({"date": d, "amount": round(total, 2)})
-    print(f"  -> {len(result)} days of turnover data")
+    print(f"  -> {len(result)} days from Tencent")
     return result
 
 
@@ -418,7 +479,7 @@ def fetch_board_ladder():
         "fs": "m:0+t:6,m:0+t:80,m:1+t:2,m:1+t:23",
         "fields": "f2,f3,f12,f14",
     })
-    if data.get("data", {}).get("diff"):
+    if data and data.get("data", {}).get("diff"):
         limit_up_stocks = [r for r in data["data"]["diff"] if _sf(r.get("f3")) >= 9.8]
         n = len(limit_up_stocks)
         # Estimate ladder distribution based on total limit-up count
@@ -449,7 +510,7 @@ def fetch_daily_lottery_board():
         "fields": "f2,f3,f12,f14",
     })
     limit_stocks = []
-    if data.get("data", {}).get("diff"):
+    if data and data.get("data", {}).get("diff"):
         limit_stocks = [r for r in data["data"]["diff"] if _sf(r.get("f3")) >= 9.8]
     return {
         "count": len(limit_stocks),
