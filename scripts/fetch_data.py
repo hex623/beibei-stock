@@ -188,6 +188,7 @@ def fetch_sentiment(indices):
         "limit_down": limit_down,
         "advance_decline_ratio": ratio,
         "total_amount": total_amount_str,
+        "board_height": "—",
         "indices": indices or [],
         "updated_at": time.strftime("%Y-%m-%d %H:%M:%S"),
     }
