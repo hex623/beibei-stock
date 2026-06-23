@@ -59,6 +59,18 @@
   font-family: monospace;
 }
 
+/* 页面切换标签 */
+.top-tabs {
+  display: flex; gap: 0; background: var(--bg-primary);
+  border-radius: 8px; padding: 3px;
+}
+.top-tabs a {
+  padding: 8px 20px; border-radius: 6px; font-size: 14px; font-weight: 500;
+  color: var(--text-muted); text-decoration: none; transition: all 0.2s;
+}
+.top-tabs a:hover { color: var(--text-primary); background: var(--bg-hover); }
+.top-tabs a.active { color: var(--text-primary); background: var(--bg-card); }
+
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
