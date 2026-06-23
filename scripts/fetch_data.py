@@ -131,6 +131,25 @@ def fetch_indices():
     return records
 
 
+def _calc_total_amount(indices):
+    """从指数数据计算沪深成交额（指数数据来自腾讯，即使东财挂了也有）"""
+    sh_amount, sz_amount = 0, 0
+    for idx in (indices or []):
+        name = idx.get("name", "")
+        amt_str = idx.get("amount", "0亿")
+        try:
+            amt_val = float(amt_str.replace("亿", "").replace(",", ""))
+        except:
+            continue
+        if "上证" in name:
+            sh_amount = amt_val
+        elif "深证" in name or "深成" in name:
+            sz_amount = amt_val
+    if sh_amount + sz_amount > 0:
+        return f"{sh_amount + sz_amount:.0f}亿"
+    return "—"
+
+
 def _count_limits_sorted(sort_dir="desc", threshold=9.8, pz=100, max_pages=2):
     """按涨跌幅排序取前N页，精确统计涨停/跌停家数
     sort_dir: 'desc' 涨停(最高涨幅在前), 'asc' 跌停(最大跌幅在前)
@@ -266,6 +285,7 @@ def fetch_sentiment(indices):
         ratio = round(up_count_extrapolated / down_count_extrapolated, 2) if down_count_extrapolated > 0 else "—"
     elif last_real:
         # ❌ 全挂，用上日真实数据
+        total_amount_str = _calc_total_amount(indices)
         print(f"  All APIs down, using last real data ({last_real['date']})")
         return {
             "sentiment_temperature": last_real.get("temperature", 50),
@@ -276,7 +296,7 @@ def fetch_sentiment(indices):
             "limit_up": last_real["limit_up"],
             "limit_down": last_real["limit_down"],
             "advance_decline_ratio": round(last_real["up_count"] / last_real["down_count"], 2) if last_real["down_count"] > 0 else "—",
-            "total_amount": "—",
+            "total_amount": total_amount_str,
             "board_height": "—",
             "indices": indices or [],
             "updated_at": time.strftime("%Y-%m-%d %H:%M:%S"),
@@ -288,18 +308,7 @@ def fetch_sentiment(indices):
         return None
 
     # 成交额取沪深之和（上证+深证）
-    total_amount_str = "—"
-    sh_amount, sz_amount = 0, 0
-    for idx in (indices or []):
-        name = idx.get("name", "")
-        amt_str = idx.get("amount", "0亿")
-        amt_val = float(amt_str.replace("亿", "").replace(",", ""))
-        if "上证" in name:
-            sh_amount = amt_val
-        elif "深证" in name or "深成" in name:
-            sz_amount = amt_val
-    if sh_amount + sz_amount > 0:
-        total_amount_str = f"{sh_amount + sz_amount:.0f}亿"
+    total_amount_str = _calc_total_amount(indices)
 
     result = {
         "sentiment_temperature": round((up_count_extrapolated / total_stocks) * 100) if total_stocks > 0 else 50,
