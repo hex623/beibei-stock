@@ -480,4 +480,9 @@ body {
   .grid-4, .grid-3, .grid-2 { grid-template-columns: 1fr; }
   .temp-value { font-size: 28px; }
   .chart-container { height: 300px; }
+  .top-bar { padding: 0 12px; flex-wrap: wrap; height: auto; min-height: 56px; gap: 8px; }
+  .top-tabs a { padding: 6px 12px; font-size: 13px; }
+  .visitor-count { display: none; }
+  .top-bar-time { font-size: 11px; }
+  .top-bar-sub { font-size: 12px; padding-left: 8px; }
 }

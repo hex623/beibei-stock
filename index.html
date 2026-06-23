@@ -393,7 +393,18 @@
         indexChangeChart = echarts.init(document.getElementById('indexChangeChart'));
         window.addEventListener('resize', () => indexChangeChart.resize());
       }
-      const names = data.map(d => d.name.replace('指数', ''));
+      const names = data.map(d => {
+        const n = d.name;
+        if (n.includes('上证指数')) return '上证';
+        if (n.includes('深证成指')) return '深证';
+        if (n.includes('创业板指')) return '创业板';
+        if (n.includes('科创50')) return '科创50';
+        if (n.includes('沪深300')) return '沪深300';
+        if (n.includes('上证50')) return '上证50';
+        if (n.includes('中证500')) return '中证500';
+        if (n.includes('中证1000')) return '中证1000';
+        return n;
+      });
       const changes = data.map(d => d.change_pct || 0);
       indexChangeChart.setOption({
         backgroundColor: 'transparent',
@@ -594,7 +605,7 @@
         <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
           ${indexAnalysis.map(idx => `
             <div style="background:var(--bg-secondary);border-radius:var(--radius-sm);padding:10px;text-align:center">
-              <div style="font-size:12px;color:var(--text-muted);margin-bottom:4px">${idx.name.replace('指数','')}</div>
+              <div style="font-size:12px;color:var(--text-muted);margin-bottom:4px">${idx.name.replace('上证指数','上证').replace('深证成指','深证').replace('创业板指','创业板')}</div>
               <div style="font-size:16px;font-weight:700;color:${idx.change >= 0 ? 'var(--accent-red)' : 'var(--accent-green)'}">${idx.change > 0 ? '+' : ''}${idx.change.toFixed(2)}%</div>
               <div style="font-size:11px;color:${idx.color};margin-top:2px">${idx.icon} ${idx.status}</div>
             </div>
@@ -2526,7 +2537,7 @@ Step 7: 输出本周更新摘要</pre>
     });
 
     // Smooth scroll for nav links
-    document.querySelectorAll('.nav-links a').forEach(link => {
+    document.querySelectorAll('.pool-nav-link').forEach(link => {
       link.addEventListener('click', (e) => {
         e.preventDefault();
         const target = document.querySelector(link.getAttribute('href'));
@@ -2767,9 +2778,6 @@ Step 7: 输出本周更新摘要</pre>
     }
     .pool-page .stock-table tr:hover td { background: rgba(255,255,255,0.02); }
 
-    .pool-page .nav-links a { font-size: 14px; font-weight: 500; color: var(--text-muted); text-decoration: none; transition: color 0.2s; letter-spacing: -0.1px; }
-    .pool-page .nav-links a:hover, .pool-page .nav-links a.active { color: var(--text-primary); }
-
     .pool-page .last-update { font-size: 12px; color: var(--text-faint); font-family: 'JetBrains Mono', monospace; }
 
     footer {
@@ -2790,12 +2798,31 @@ Step 7: 输出本周更新摘要</pre>
       background: rgba(16,185,129,0.1); color: var(--success); border: 1px solid rgba(16,185,129,0.3);
     }
 
+    .pool-page .filters {
+      display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px;
+    }
+
+    /* Pool view toggle */
+    .pool-page .grid-container { display: block; }
+    .pool-page .grid-container.hidden { display: none; }
+    .pool-page .table-container { display: none; }
+    .pool-page .table-container.active { display: block; }
+    .pool-page .stock-name-cell {
+      display: flex; align-items: center; gap: 10px;
+    }
+    .pool-page .stock-name-cell .stock-icon {
+      width: 32px; height: 32px; font-size: 11px;
+    }
+
     @media (max-width: 768px) {
       .pool-page .stock-grid { grid-template-columns: 1fr; }
       .pool-page .stats-bar { flex-wrap: wrap; gap: 24px; }
-      .pool-page .hero h1 { font-size: 32px; }
+      .pool-page .hero h1 { font-size: 28px; }
       .pool-page .hero { padding: 60px 16px 32px; }
       .pool-page .main { padding: 0 16px 32px; }
+      .pool-page .section-header { flex-direction: column; align-items: flex-start; gap: 12px; }
+      .pool-page .stock-card { padding: 16px; }
+      .pool-page .card-metrics { grid-template-columns: 1fr; }
     }
 
     /* Navigation shared by both pages */
@@ -2834,6 +2861,13 @@ function switchView(view) {
   document.getElementById('tab-market').className = view === 'market' ? 'active' : '';
   document.getElementById('tab-pool').className = view === 'pool' ? 'active' : '';
   document.getElementById('viewLabel').textContent = view === 'market' ? '大盘监控' : 'AI股票池';
+  // 切回大盘监控时重置ECharts大小
+  if (view === 'market') {
+    setTimeout(() => {
+      [indexChart, turnoverChart, sentimentTrendChart, limitChart, ladderChart, indexChangeChart]
+        .filter(Boolean).forEach(c => c.resize());
+    }, 100);
+  }
 }
 </script>
 
