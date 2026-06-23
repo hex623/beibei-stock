@@ -37,6 +37,24 @@ def _fetch_json(url, params=None):
     return {"rc": -1, "data": None}
 
 
+def _fetch_tencent(url, params=None):
+    """Tencent Finance API 请求（尝试多个域名）"""
+    domains = [
+        "http://qt.gtimg.cn",
+        "http://ifzq.gtimg.cn",
+        "https://web.ifzq.gtimg.cn",
+    ]
+    for domain in domains:
+        full_url = url.replace("http://qt.gtimg.cn", domain)
+        try:
+            raw = _fetch(full_url, params, timeout=8)
+            if raw:
+                return raw.decode("gbk", errors="ignore")
+        except:
+            continue
+    return ""
+
+
 def _em_get(params, timeout=8):
     """East Money API 请求（带重试和备用域名）"""
     urls = [
@@ -252,20 +270,8 @@ def fetch_sentiment(indices):
             }
             data = _em_get(params)
             if not data or not data.get("data", {}).get("diff"):
-                print("  -> All APIs failed, using estimate")
-                result = {
-                    "sentiment_temperature": 50,
-                    "total_stocks": total_stocks,
-                    "up_count": round(total_stocks * 0.45),
-                    "down_count": round(total_stocks * 0.45),
-                    "flat_count": round(total_stocks * 0.1),
-                    "limit_up": 0, "limit_down": 0,
-                    "advance_decline_ratio": "—",
-                    "total_amount": "—",
-                    "indices": indices or [],
-                    "updated_at": time.strftime("%Y-%m-%d %H:%M:%S"),
-                }
-                return result
+                print("  -> All APIs failed, keeping existing data")
+                return None
             total_stocks = data["data"].get("total", 5300)
             all_items = list(data["data"]["diff"])
             per_page = len(all_items)
