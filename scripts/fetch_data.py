@@ -113,37 +113,44 @@ def fetch_indices():
     return records
 
 
-def _fetch_limit_pool(pool_type):
-    """从东财涨停/跌停板池直接获取总数（1次API调用即可）
-    pool_type: 'zt' 涨停 or 'dt' 跌停
-    返回 (总数, 数据列表) 或 (None, [])
+def _count_limits_sorted(sort_dir="desc", threshold=9.8, pz=100, max_pages=2):
+    """按涨跌幅排序取前N页，精确统计涨停/跌停家数
+    sort_dir: 'desc' 涨停(最高涨幅在前), 'asc' 跌停(最大跌幅在前)
+    返回 (精确计数, 是否完整)
     """
-    url = "https://push2ex.eastmoney.com/getTopicZTPool"
     params = {
-        "type": pool_type, "pageindex": "0", "pagesize": "5",
-        "sort": "fbt:desc", "market": "0",
-        "ut": "7eea3edcaed734bea9c7587c31ab1d41",
+        "pn": 1, "pz": pz, "po": 0, "np": 1,
+        "ut": "bd1d9ddb04089700cf9c27f6f7426281",
+        "fltt": 2, "invt": 2, "fid": "f3",
+        "fs": "m:0+t:6,m:0+t:80,m:1+t:2,m:1+t:23,m:0+t:81+s:2048",
+        "fields": "f2,f3,f12,f14",
     }
-    raw = _fetch(url, params)
-    if not raw:
-        return None, []
-    try:
-        text = raw.decode("utf-8").strip()
-        if "(" in text:
-            text = text[text.index("(")+1:text.rindex(")")]
-        data = json.loads(text)
-        if data.get("rc") != 0:
-            return None, []
-        items = data.get("data", [])
-        if isinstance(items, dict):
-            total = items.get("total", len(items.get("list", [])))
-            return total, items.get("list", [])
-        elif isinstance(items, list):
-            return len(items), items
-        return None, items or []
-    except Exception as e:
-        print(f"    ZTPool({pool_type}) parse error: {e}")
-        return None, []
+    if sort_dir == "desc":
+        params["po"] = 1  # 降序
+        cond = lambda v: v >= threshold
+    else:
+        params["po"] = 0  # 升序（默认）
+        cond = lambda v: v <= -threshold
+
+    data = _em_get(params)
+    if not data or not data.get("data", {}).get("diff"):
+        return 0, False
+
+    items = data["data"]["diff"]
+    count = sum(1 for r in items if cond(_sf(r.get("f3"))))
+
+    # 如果第一页刚好满额，可能还有遗漏，再翻下一页确认
+    if count >= pz:
+        for page in range(2, max_pages + 1):
+            p = dict(params, pn=page)
+            d = _em_get(p)
+            if d and d.get("data", {}).get("diff"):
+                more = sum(1 for r in d["data"]["diff"] if cond(_sf(r.get("f3"))))
+                count += more
+                if more < pz:
+                    break  # 这页没满，说明到尾部了
+            time.sleep(0.3)
+    return count, True
 
 
 def _fetch_all_market_pages(params, max_retries=3):
@@ -185,38 +192,34 @@ def fetch_sentiment(indices):
     total_stocks = 5300
     today = time.strftime("%Y-%m-%d")
 
-    # ===== 第1层：专用涨停/跌停板池API（最准确，1次调用即可）=====
-    print("  Tier 1: ZTPool dedicated API...")
-    zt_total, zt_items = _fetch_limit_pool("zt")
-    dt_total, dt_items = _fetch_limit_pool("dt")
-    if zt_total is not None and dt_total is not None:
-        print(f"    ZTPool OK: 涨停={zt_total}, 跌停={dt_total}")
-        limit_up, limit_down = zt_total, dt_total
-        # 计数涨跌家数用全市场排序页面（只需第一页取比例）
-        params = {
-            "pn": 1, "pz": 100, "po": 0, "np": 1,
-            "ut": "bd1d9ddb04089700cf9c27f6f7426281",
-            "fltt": 2, "invt": 2, "fid": "f12",
-            "fs": "m:0+t:6,m:0+t:80,m:1+t:2,m:1+t:23,m:0+t:81+s:2048",
-            "fields": "f2,f3,f4,f5,f6,f12,f14",
-        }
-        data = _em_get(params)
-        if data and data.get("data", {}).get("diff"):
-            total_stocks = data["data"].get("total", 5300)
-            items = data["data"]["diff"]
-            up_count = sum(1 for r in items if _sf(r.get("f3")) > 0)
-            down_count = sum(1 for r in items if _sf(r.get("f3")) < 0)
-            sampled = len(items)
-            up_ratio = up_count / sampled if sampled > 0 else 0.5
-            ratio = round(up_count / down_count, 2) if down_count > 0 else "—"
-            up_count_extrapolated = round(total_stocks * up_ratio)
-            down_count_extrapolated = total_stocks - up_count_extrapolated
-        else:
-            up_count_extrapolated = round(total_stocks * 0.45)
-            down_count_extrapolated = round(total_stocks * 0.45)
-            ratio = "—"
+    # ===== 第1层：按涨跌幅排序取前2页（涨停/跌停通常<100家，一页搞定）=====
+    print("  Tier 1: sorted by change% (desc/asc)...")
+    limit_up, _ = _count_limits_sorted("desc", 9.8)
+    limit_down, _ = _count_limits_sorted("asc", 9.8)
+    print(f"    Sorted OK: 涨停={limit_up}, 跌停={limit_down}")
+    # 涨跌家数用第一页取比例推算
+    params = {
+        "pn": 1, "pz": 100, "po": 0, "np": 1,
+        "ut": "bd1d9ddb04089700cf9c27f6f7426281",
+        "fltt": 2, "invt": 2, "fid": "f12",
+        "fs": "m:0+t:6,m:0+t:80,m:1+t:2,m:1+t:23,m:0+t:81+s:2048",
+        "fields": "f2,f3,f4,f5,f6,f12,f14",
+    }
+    data = _em_get(params)
+    if data and data.get("data", {}).get("diff"):
+        total_stocks = data["data"].get("total", 5300)
+        items = data["data"]["diff"]
+        up_count = sum(1 for r in items if _sf(r.get("f3")) > 0)
+        down_count = sum(1 for r in items if _sf(r.get("f3")) < 0)
+        sampled = len(items)
+        up_ratio = up_count / sampled if sampled > 0 else 0.5
+        ratio = round(up_count / down_count, 2) if down_count > 0 else "—"
+        up_count_extrapolated = round(total_stocks * up_ratio)
+        down_count_extrapolated = total_stocks - up_count_extrapolated
     else:
-        # ===== 第2层：遍历全市场所有页面（慢但准确）=====
+        up_count_extrapolated = round(total_stocks * 0.45)
+        down_count_extrapolated = round(total_stocks * 0.45)
+        ratio = "—"
         print("  Tier 2: full market scan...")
         params = {
             "pn": 1, "pz": 100, "po": 0, "np": 1,
