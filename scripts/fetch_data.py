@@ -171,12 +171,24 @@ def fetch_sentiment(indices):
     up_ratio = up_count / sampled if sampled > 0 else 0.5
     ratio = round(up_count / down_count, 2) if down_count > 0 else "—"
 
-    # 成交额取上证
+    # 等比放大涨停/跌停到全市场
+    scale = total_stocks / sampled if sampled > 0 else 1
+    limit_up_extrapolated = round(limit_up * scale)
+    limit_down_extrapolated = round(limit_down * scale)
+
+    # 成交额取沪深之和（上证+深证）
     total_amount_str = "—"
+    sh_amount, sz_amount = 0, 0
     for idx in (indices or []):
-        if "上证" in idx.get("name", ""):
-            total_amount_str = idx.get("amount", "—")
-            break
+        name = idx.get("name", "")
+        amt_str = idx.get("amount", "0亿")
+        amt_val = float(amt_str.replace("亿", "").replace(",", ""))
+        if "上证" in name:
+            sh_amount = amt_val
+        elif "深证" in name or "深成" in name:
+            sz_amount = amt_val
+    if sh_amount + sz_amount > 0:
+        total_amount_str = f"{sh_amount + sz_amount:.0f}亿"
 
     result = {
         "sentiment_temperature": round(up_ratio * 100),
@@ -184,8 +196,8 @@ def fetch_sentiment(indices):
         "up_count": round(total_stocks * up_ratio),
         "down_count": total_stocks - round(total_stocks * up_ratio),
         "flat_count": 0,
-        "limit_up": limit_up,
-        "limit_down": limit_down,
+        "limit_up": limit_up_extrapolated,
+        "limit_down": limit_down_extrapolated,
         "advance_decline_ratio": ratio,
         "total_amount": total_amount_str,
         "board_height": "—",

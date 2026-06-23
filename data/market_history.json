@@ -38,8 +38,8 @@
   {
     "date": "2026-06-23",
     "temperature": 25,
-    "limit_up": 15,
-    "limit_down": 125,
+    "limit_up": 132,
+    "limit_down": 1104,
     "up_count": 1200,
     "down_count": 4100,
     "board_height": "—"

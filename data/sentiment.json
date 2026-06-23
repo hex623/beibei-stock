@@ -4,8 +4,8 @@
   "up_count": 1200,
   "down_count": 4100,
   "flat_count": 530,
-  "limit_up": 15,
-  "limit_down": 125,
+  "limit_up": 132,
+  "limit_down": 1104,
   "advance_decline_ratio": 0.29,
   "total_amount": "34408亿",
   "indices": [
