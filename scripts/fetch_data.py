@@ -113,68 +113,180 @@ def fetch_indices():
     return records
 
 
-def fetch_sentiment(indices):
-    """市场情绪"""
-    print("Fetching sentiment...")
-    # 用 East Money 采样
+def _fetch_limit_pool(pool_type):
+    """从东财涨停/跌停板池直接获取总数（1次API调用即可）
+    pool_type: 'zt' 涨停 or 'dt' 跌停
+    返回 (总数, 数据列表) 或 (None, [])
+    """
+    url = "https://push2ex.eastmoney.com/getTopicZTPool"
     params = {
-        "pn": 1, "pz": 100, "po": 0, "np": 1,
-        "ut": "bd1d9ddb04089700cf9c27f6f7426281",
-        "fltt": 2, "invt": 2, "fid": "f12",
-        "fs": "m:0+t:6,m:0+t:80,m:1+t:2,m:1+t:23,m:0+t:81+s:2048",
-        "fields": "f2,f3,f4,f5,f6,f12,f14",
+        "type": pool_type, "pageindex": "0", "pagesize": "5",
+        "sort": "fbt:desc", "market": "0",
+        "ut": "7eea3edcaed734bea9c7587c31ab1d41",
     }
-    total_stocks = 5300
-    up_count, down_count, limit_up, limit_down = 0, 0, 0, 0
-    total_amount = 0
-    sampled = 0
+    raw = _fetch(url, params)
+    if not raw:
+        return None, []
+    try:
+        text = raw.decode("utf-8").strip()
+        if "(" in text:
+            text = text[text.index("(")+1:text.rindex(")")]
+        data = json.loads(text)
+        if data.get("rc") != 0:
+            return None, []
+        items = data.get("data", [])
+        if isinstance(items, dict):
+            total = items.get("total", len(items.get("list", [])))
+            return total, items.get("list", [])
+        elif isinstance(items, list):
+            return len(items), items
+        return None, items or []
+    except Exception as e:
+        print(f"    ZTPool({pool_type}) parse error: {e}")
+        return None, []
 
-    # 取首页
+
+def _fetch_all_market_pages(params, max_retries=3):
+    """遍历全市场所有页面，获取完整股票列表（准确但慢）
+    返回 (all_items, total_stocks)
+    """
+    # 取第一页获取总数
     data = _em_get(params)
     if not data or not data.get("data", {}).get("diff"):
-        print("  -> East Money unavailable, using estimate")
-        # 用腾讯数据做粗略估计
-        result = {
-            "sentiment_temperature": 50,
-            "total_stocks": total_stocks,
-            "up_count": round(total_stocks * 0.45),
-            "down_count": round(total_stocks * 0.45),
-            "flat_count": round(total_stocks * 0.1),
-            "limit_up": 0, "limit_down": 0,
-            "advance_decline_ratio": "—",
-            "total_amount": "—",
-            "indices": indices or [],
-            "updated_at": time.strftime("%Y-%m-%d %H:%M:%S"),
-        }
-        return result
-    
+        return None, 0
     total_stocks = data["data"].get("total", 5300)
     all_items = list(data["data"]["diff"])
-    # 再取几页
     per_page = len(all_items)
+    if per_page == 0:
+        return None, 0
     total_pages = max(1, math.ceil(total_stocks / per_page))
-    for page in [2, 3, total_pages - 2, total_pages - 1, total_pages]:
-        if page > 1 and page <= total_pages:
+    print(f"    Full scan: {total_stocks} stocks, {total_pages} pages...")
+    for page in range(2, total_pages + 1):
+        success = False
+        for attempt in range(max_retries):
             p = dict(params, pn=page)
             d = _em_get(p)
             if d and d.get("data", {}).get("diff"):
                 all_items.extend(d["data"]["diff"])
-            time.sleep(0.5)
+                success = True
+                break
+            time.sleep(1)
+        if not success:
+            print(f"    Page {page}/{total_pages} failed after {max_retries} retries, stopping")
+            break
+        time.sleep(0.3)
+    print(f"    Got {len(all_items)}/{total_stocks} stocks from {total_pages} pages")
+    return all_items, total_stocks
 
-    up_count = sum(1 for r in all_items if _sf(r.get("f3")) > 0)
-    down_count = sum(1 for r in all_items if _sf(r.get("f3")) < 0)
-    sampled = len(all_items)
-    limit_up = sum(1 for r in all_items if _sf(r.get("f3")) >= 9.8)
-    limit_down = sum(1 for r in all_items if _sf(r.get("f3")) <= -9.8)
-    total_amount = sum(_sf(r.get("f6", 0)) for r in all_items)
 
-    up_ratio = up_count / sampled if sampled > 0 else 0.5
-    ratio = round(up_count / down_count, 2) if down_count > 0 else "—"
+def fetch_sentiment(indices):
+    """市场情绪 — 三层降级策略"""
+    print("Fetching sentiment...")
+    total_stocks = 5300
+    today = time.strftime("%Y-%m-%d")
 
-    # 等比放大涨停/跌停到全市场
-    scale = total_stocks / sampled if sampled > 0 else 1
-    limit_up_extrapolated = round(limit_up * scale)
-    limit_down_extrapolated = round(limit_down * scale)
+    # ===== 第1层：专用涨停/跌停板池API（最准确，1次调用即可）=====
+    print("  Tier 1: ZTPool dedicated API...")
+    zt_total, zt_items = _fetch_limit_pool("zt")
+    dt_total, dt_items = _fetch_limit_pool("dt")
+    if zt_total is not None and dt_total is not None:
+        print(f"    ZTPool OK: 涨停={zt_total}, 跌停={dt_total}")
+        limit_up, limit_down = zt_total, dt_total
+        # 计数涨跌家数用全市场排序页面（只需第一页取比例）
+        params = {
+            "pn": 1, "pz": 100, "po": 0, "np": 1,
+            "ut": "bd1d9ddb04089700cf9c27f6f7426281",
+            "fltt": 2, "invt": 2, "fid": "f12",
+            "fs": "m:0+t:6,m:0+t:80,m:1+t:2,m:1+t:23,m:0+t:81+s:2048",
+            "fields": "f2,f3,f4,f5,f6,f12,f14",
+        }
+        data = _em_get(params)
+        if data and data.get("data", {}).get("diff"):
+            total_stocks = data["data"].get("total", 5300)
+            items = data["data"]["diff"]
+            up_count = sum(1 for r in items if _sf(r.get("f3")) > 0)
+            down_count = sum(1 for r in items if _sf(r.get("f3")) < 0)
+            sampled = len(items)
+            up_ratio = up_count / sampled if sampled > 0 else 0.5
+            ratio = round(up_count / down_count, 2) if down_count > 0 else "—"
+            up_count_extrapolated = round(total_stocks * up_ratio)
+            down_count_extrapolated = total_stocks - up_count_extrapolated
+        else:
+            up_count_extrapolated = round(total_stocks * 0.45)
+            down_count_extrapolated = round(total_stocks * 0.45)
+            ratio = "—"
+    else:
+        # ===== 第2层：遍历全市场所有页面（慢但准确）=====
+        print("  Tier 2: full market scan...")
+        params = {
+            "pn": 1, "pz": 100, "po": 0, "np": 1,
+            "ut": "bd1d9ddb04089700cf9c27f6f7426281",
+            "fltt": 2, "invt": 2, "fid": "f12",
+            "fs": "m:0+t:6,m:0+t:80,m:1+t:2,m:1+t:23,m:0+t:81+s:2048",
+            "fields": "f2,f3,f4,f5,f6,f12,f14",
+        }
+        all_items, total_stocks = _fetch_all_market_pages(params)
+        if all_items and len(all_items) > 0:
+            up_count = sum(1 for r in all_items if _sf(r.get("f3")) > 0)
+            down_count = sum(1 for r in all_items if _sf(r.get("f3")) < 0)
+            limit_up = sum(1 for r in all_items if _sf(r.get("f3")) >= 9.8)
+            limit_down = sum(1 for r in all_items if _sf(r.get("f3")) <= -9.8)
+            sampled = len(all_items)
+            up_ratio = up_count / sampled if sampled > 0 else 0.5
+            ratio = round(up_count / down_count, 2) if down_count > 0 else "—"
+            up_count_extrapolated = round(total_stocks * up_ratio)
+            down_count_extrapolated = total_stocks - up_count_extrapolated
+            print(f"    Full scan result: 涨={up_count_extrapolated}, 跌={down_count_extrapolated}, 涨停={limit_up}, 跌停={limit_down}")
+        else:
+            # ===== 第3层：抽样+等比放大（最快，近似准确）=====
+            print("  Tier 3: sampling + extrapolation...")
+            params = {
+                "pn": 1, "pz": 100, "po": 0, "np": 1,
+                "ut": "bd1d9ddb04089700cf9c27f6f7426281",
+                "fltt": 2, "invt": 2, "fid": "f12",
+                "fs": "m:0+t:6,m:0+t:80,m:1+t:2,m:1+t:23,m:0+t:81+s:2048",
+                "fields": "f2,f3,f4,f5,f6,f12,f14",
+            }
+            data = _em_get(params)
+            if not data or not data.get("data", {}).get("diff"):
+                print("  -> All APIs failed, using estimate")
+                result = {
+                    "sentiment_temperature": 50,
+                    "total_stocks": total_stocks,
+                    "up_count": round(total_stocks * 0.45),
+                    "down_count": round(total_stocks * 0.45),
+                    "flat_count": round(total_stocks * 0.1),
+                    "limit_up": 0, "limit_down": 0,
+                    "advance_decline_ratio": "—",
+                    "total_amount": "—",
+                    "indices": indices or [],
+                    "updated_at": time.strftime("%Y-%m-%d %H:%M:%S"),
+                }
+                return result
+            total_stocks = data["data"].get("total", 5300)
+            all_items = list(data["data"]["diff"])
+            per_page = len(all_items)
+            total_pages = max(1, math.ceil(total_stocks / per_page))
+            for page in [2, 3, total_pages - 2, total_pages - 1, total_pages]:
+                if page > 1 and page <= total_pages:
+                    p = dict(params, pn=page)
+                    d = _em_get(p)
+                    if d and d.get("data", {}).get("diff"):
+                        all_items.extend(d["data"]["diff"])
+                    time.sleep(0.5)
+            up_count = sum(1 for r in all_items if _sf(r.get("f3")) > 0)
+            down_count = sum(1 for r in all_items if _sf(r.get("f3")) < 0)
+            sampled = len(all_items)
+            limit_up = sum(1 for r in all_items if _sf(r.get("f3")) >= 9.8)
+            limit_down = sum(1 for r in all_items if _sf(r.get("f3")) <= -9.8)
+            up_ratio = up_count / sampled if sampled > 0 else 0.5
+            ratio = round(up_count / down_count, 2) if down_count > 0 else "—"
+            scale = total_stocks / sampled if sampled > 0 else 1
+            limit_up = round(limit_up * scale)
+            limit_down = round(limit_down * scale)
+            up_count_extrapolated = round(total_stocks * up_ratio)
+            down_count_extrapolated = total_stocks - up_count_extrapolated
+            print(f"    Sample result: 涨={up_count_extrapolated}, 跌={down_count_extrapolated}, 涨停={limit_up}, 跌停={limit_down}")
 
     # 成交额取沪深之和（上证+深证）
     total_amount_str = "—"
@@ -191,13 +303,13 @@ def fetch_sentiment(indices):
         total_amount_str = f"{sh_amount + sz_amount:.0f}亿"
 
     result = {
-        "sentiment_temperature": round(up_ratio * 100),
+        "sentiment_temperature": round((up_count_extrapolated / total_stocks) * 100) if total_stocks > 0 else 50,
         "total_stocks": total_stocks,
-        "up_count": round(total_stocks * up_ratio),
-        "down_count": total_stocks - round(total_stocks * up_ratio),
-        "flat_count": 0,
-        "limit_up": limit_up_extrapolated,
-        "limit_down": limit_down_extrapolated,
+        "up_count": up_count_extrapolated,
+        "down_count": down_count_extrapolated,
+        "flat_count": max(0, total_stocks - up_count_extrapolated - down_count_extrapolated),
+        "limit_up": limit_up,
+        "limit_down": limit_down,
         "advance_decline_ratio": ratio,
         "total_amount": total_amount_str,
         "board_height": "—",
