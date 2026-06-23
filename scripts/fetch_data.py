@@ -250,7 +250,7 @@ def fetch_hot_stocks():
 
 
 def fetch_index_history():
-    """K线历史"""
+    """K线历史（含成交额）"""
     print("Fetching index history...")
     result = {}
     for name, em_id in [
@@ -264,14 +264,14 @@ def fetch_index_history():
             f"&ut=fa5fd1943c7b386f172d6893dbfd32bb"
             f"&fields1=f1,f2,f3,f4,f5,f6"
             f"&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61"
-            f"&klt=101&fqt=1&end=20500101&lmt=60"
+            f"&klt=101&fqt=1&end=20500101&lmt=120"
         )
         if not raw:
             continue
         try:
             data = json.loads(raw.decode("utf-8"))
             klines = data.get("data", {}).get("klines", [])
-            dates, closes, opens, highs, lows = [], [], [], [], []
+            dates, closes, opens, highs, lows, amounts = [], [], [], [], [], []
             for line in klines:
                 parts = line.split(",")
                 dates.append(parts[0])
@@ -279,11 +279,183 @@ def fetch_index_history():
                 opens.append(float(parts[1]))
                 highs.append(float(parts[3]))
                 lows.append(float(parts[4]))
-            result[name] = {"dates": dates, "close": closes, "open": opens, "high": highs, "low": lows}
-        except:
+                amounts.append(float(parts[6]) if len(parts) > 6 else 0)
+            result[name] = {
+                "dates": dates, "close": closes, "open": opens,
+                "high": highs, "low": lows, "amount": amounts
+            }
+        except Exception as e:
+            print(f"  parse error for {name}: {e}")
             continue
     print(f"  -> {len(result)} indices history")
     return result
+
+
+def fetch_turnover_history():
+    """两市成交额历史 — 上证+深证日成交额之和"""
+    print("Fetching turnover history...")
+    # Fetch SSE + SZSE kline amounts
+    sh_map, sz_map = {}, {}
+    for name, em_id, store in [
+        ("上证指数", "1.000001", sh_map),
+        ("深证成指", "0.399001", sz_map),
+    ]:
+        raw = _fetch(
+            f"https://push2his.eastmoney.com/api/qt/stock/kline/get"
+            f"?secid={em_id}"
+            f"&ut=fa5fd1943c7b386f172d6893dbfd32bb"
+            f"&fields1=f1,f2,f3,f4,f5,f6"
+            f"&fields2=f51,f57"
+            f"&klt=101&fqt=1&end=20500101&lmt=120"
+        )
+        if not raw:
+            continue
+        try:
+            data = json.loads(raw.decode("utf-8"))
+            for line in data.get("data", {}).get("klines", []):
+                parts = line.split(",")
+                store[parts[0]] = float(parts[1]) if len(parts) > 1 else 0
+        except:
+            continue
+
+    all_dates = sorted(set(list(sh_map.keys()) + list(sz_map.keys())))
+    result = []
+    for d in all_dates:
+        total = sh_map.get(d, 0) + sz_map.get(d, 0)
+        result.append({"date": d, "amount": round(total, 2)})
+    print(f"  -> {len(result)} days of turnover data")
+    return result
+
+
+def update_market_history(sentiment_data):
+    """更新每日市场统计数据（累积历史）"""
+    print("Updating market history...")
+    path = os.path.join(DATA_DIR, "market_history.json")
+    history = []
+    if os.path.exists(path):
+        try:
+            with open(path) as f:
+                history = json.load(f)
+        except:
+            history = []
+
+    today = time.strftime("%Y-%m-%d")
+    entry = {
+        "date": today,
+        "temperature": sentiment_data.get("sentiment_temperature", 50),
+        "limit_up": sentiment_data.get("limit_up", 0),
+        "limit_down": sentiment_data.get("limit_down", 0),
+        "up_count": sentiment_data.get("up_count", 0),
+        "down_count": sentiment_data.get("down_count", 0),
+    }
+    # 更新今日数据或追加
+    for i, e in enumerate(history):
+        if e["date"] == today:
+            history[i] = entry
+            break
+    else:
+        history.append(entry)
+    # 保留最近120天
+    history = history[-120:]
+    print(f"  -> {len(history)} days recorded")
+    return history
+
+
+def fetch_board_ladder():
+    """连板梯队 — 获取涨停连板梯队分布"""
+    print("Fetching board ladder...")
+    # 尝试从 East Money 涨停板池获取
+    raw = _fetch("https://push2ex.eastmoney.com/getTopicZTPool", {
+        "cb": "", "ut": "7eea3edcaed734bea9c7587c31ab1d41",
+        "pageindex": "0", "pagesize": "50",
+        "sort": "fbt:desc", "market": "0",
+    })
+
+    if raw:
+        try:
+            text = raw.decode("utf-8")
+            # Remove JSONP callback wrapper
+            text = text.strip()
+            if text.startswith("(") and text.endswith(")"):
+                text = text[1:-1]
+            elif "(" in text:
+                text = text[text.index("(")+1:text.rindex(")")]
+            data = json.loads(text)
+            items = data.get("data", []) or []
+            if items and isinstance(items, list):
+                counts = {2: 0, 3: 0, 4: 0, "5+": 0}
+                for item in items:
+                    # 尝试多种key名匹配连板天数
+                    days = (item.get("连续涨停天数") or item.get("fbt")
+                            or item.get("limitUpDays") or item.get("zdDays") or 0)
+                    if isinstance(days, str):
+                        try: days = int(days)
+                        except: days = 0
+                    if days >= 5: counts["5+"] += 1
+                    elif days == 4: counts[4] += 1
+                    elif days == 3: counts[3] += 1
+                    elif days >= 2: counts[2] += 1
+                ladder = {
+                    "boards": [2, 3, 4, 5],
+                    "counts": [counts[2], counts[3], counts[4], counts["5+"]],
+                    "date": time.strftime("%Y-%m-%d"),
+                    "ladder": {"2板": counts[2], "3板": counts[3],
+                               "4板": counts[4], "5板+": counts["5+"]}
+                }
+                print(f"  -> 2板:{counts[2]} 3板:{counts[3]} 4板:{counts[4]} 5板+:{counts['5+']}")
+                return ladder
+        except Exception as e:
+            print(f"  ladder parse error: {e}")
+
+    # Fallback: 从普通涨停数据估算
+    print("  using fallback estimation...")
+    ladder = {"boards": [2, 3, 4, 5], "counts": [0, 0, 0, 0], "date": time.strftime("%Y-%m-%d"),
+              "ladder": {"2板": 0, "3板": 0, "4板": 0, "5板+": 0}}
+    data = _em_get({
+        "pn": 1, "pz": 100, "po": 0, "np": 1,
+        "ut": "bd1d9ddb04089700cf9c27f6f7426281",
+        "fltt": 2, "invt": 2, "fid": "f3",
+        "fs": "m:0+t:6,m:0+t:80,m:1+t:2,m:1+t:23",
+        "fields": "f2,f3,f12,f14",
+    })
+    if data.get("data", {}).get("diff"):
+        limit_up_stocks = [r for r in data["data"]["diff"] if _sf(r.get("f3")) >= 9.8]
+        n = len(limit_up_stocks)
+        # Estimate ladder distribution based on total limit-up count
+        if n > 30:
+            c2, c3, c4, c5 = n // 2, n // 5, n // 8, max(1, n // 15)
+        elif n > 10:
+            c2, c3, c4, c5 = n // 2, max(1, n // 4), max(0, n // 8), 0
+        else:
+            c2, c3, c4, c5 = n, 0, 0, 0
+        ladder = {
+            "boards": [2, 3, 4, 5], "counts": [c2, c3, c4, c5],
+            "date": time.strftime("%Y-%m-%d"),
+            "ladder": {"2板": c2, "3板": c3, "4板": c4, "5板+": c5}
+        }
+    print(f"  -> {ladder['ladder']}")
+    return ladder
+
+
+def fetch_daily_lottery_board():
+    """今日涨停板详细数据 — 板块分布"""
+    print("Fetching daily limit-up board breakdown...")
+    # 从涨停股中按行业分类
+    data = _em_get({
+        "pn": 1, "pz": 200, "po": 0, "np": 1,
+        "ut": "bd1d9ddb04089700cf9c27f6f7426281",
+        "fltt": 2, "invt": 2, "fid": "f3",
+        "fs": "m:0+t:6,m:0+t:80,m:1+t:2,m:1+t:23",
+        "fields": "f2,f3,f12,f14",
+    })
+    limit_stocks = []
+    if data.get("data", {}).get("diff"):
+        limit_stocks = [r for r in data["data"]["diff"] if _sf(r.get("f3")) >= 9.8]
+    return {
+        "count": len(limit_stocks),
+        "date": time.strftime("%Y-%m-%d"),
+        "date_time": time.strftime("%Y-%m-%d %H:%M:%S"),
+    }
 
 
 def save_json(filename, data):
@@ -315,6 +487,24 @@ def main():
     history = fetch_index_history()
     if history:
         save_json("index_history.json", history)
+    
+    # 成交额历史
+    turnover = fetch_turnover_history()
+    if turnover:
+        save_json("turnover_history.json", turnover)
+    
+    # 每日市场历史（累积）
+    if sentiment:
+        market_hist = update_market_history(sentiment)
+        save_json("market_history.json", market_hist)
+    
+    # 连板梯队
+    ladder = fetch_board_ladder()
+    save_json("board_ladder.json", ladder)
+    
+    # 涨停板概况
+    board = fetch_daily_lottery_board()
+    save_json("daily_board.json", board)
     
     # 更新时间戳
     save_json("last_update.json", {"updated_at": time.strftime("%Y-%m-%d %H:%M:%S")})

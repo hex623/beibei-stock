@@ -49,12 +49,12 @@
       <div class="card">
         <div class="card-title">🔴 涨停</div>
         <div class="card-value up" id="limitUp">--</div>
-        <div class="card-sub">封板率 --</div>
+        <div class="card-sub" id="limitUpSub">封板率 --</div>
       </div>
       <div class="card">
         <div class="card-title">🟢 跌停</div>
         <div class="card-value down" id="limitDown">--</div>
-        <div class="card-sub">含ST --</div>
+        <div class="card-sub" id="limitDownSub">含ST --</div>
       </div>
       <div class="card">
         <div class="card-title">⚖️ 涨跌比</div>
@@ -76,6 +76,50 @@
         <div class="card-value" id="dataTime" style="font-size:20px;color:var(--text-secondary)">--</div>
         <div class="card-sub">GitHub Actions定时更新</div>
       </div>
+    </div>
+
+    <!-- 连板高度 + 涨跌比 高亮卡片 -->
+    <div class="grid-2" style="margin-bottom:16px;gap:16px">
+      <div class="card" style="text-align:center;padding:24px">
+        <div class="card-title" style="font-size:15px;margin-bottom:8px">🏆 连板高度</div>
+        <div style="font-size:42px;font-weight:800;color:var(--accent-red)" id="boardHeight">--</div>
+        <div class="card-sub" id="boardHeightSub">最高连板</div>
+      </div>
+      <div class="card" style="text-align:center;padding:24px">
+        <div class="card-title" style="font-size:15px;margin-bottom:8px">📊 涨停温度</div>
+        <div style="font-size:42px;font-weight:800;color:var(--accent-yellow)" id="ztTemperature">--</div>
+        <div class="card-sub" id="ztTemperatureSub">涨停家数</div>
+      </div>
+    </div>
+
+    <!-- 图表区域: 2x2 -->
+    <div class="grid-2" style="margin-bottom:16px;gap:16px">
+      <!-- 大盘成交额趋势 -->
+      <div class="card">
+        <div class="card-title">📊 大盘成交额趋势</div>
+        <div id="turnoverChart" class="chart-container"></div>
+      </div>
+      <!-- 大盘情绪趋势 -->
+      <div class="card">
+        <div class="card-title">📈 大盘情绪趋势</div>
+        <div id="sentimentTrendChart" class="chart-container"></div>
+      </div>
+      <!-- 涨跌停板分布对比 -->
+      <div class="card">
+        <div class="card-title">🔴🟢 涨跌停板分布对比</div>
+        <div id="limitChart" class="chart-container"></div>
+      </div>
+      <!-- 连板梯队结构 -->
+      <div class="card">
+        <div class="card-title">🪜 连板梯队结构</div>
+        <div id="ladderChart" class="chart-container"></div>
+      </div>
+    </div>
+
+    <!-- 指数涨跌幅 -->
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-title">📉 指数涨跌幅</div>
+      <div id="indexChangeChart" class="chart-container" style="height:220px"></div>
     </div>
 
     <!-- 指数行情 -->
@@ -101,9 +145,20 @@
   </main>
 
   <script>
-    let indexChart;
+    let indexChart, turnoverChart, sentimentTrendChart, limitChart, ladderChart, indexChangeChart;
     let indexHistoryData = {};
     let currentIndex = '上证指数';
+
+    function fmtPrice(v) { return v != null && !isNaN(v) ? v.toFixed(2) : '--'; }
+    function fmtPct(v) { return v != null && !isNaN(v) ? (v > 0 ? '+' : '') + v.toFixed(2) + '%' : '--'; }
+    function pctClass(v) { return v > 0 ? 'up' : v < 0 ? 'down' : ''; }
+    function fmtAmount(v) {
+      if (!v || isNaN(v)) return '—';
+      if (v >= 1e11) return (v/1e11).toFixed(2) + '千亿';
+      if (v >= 1e8) return (v/1e8).toFixed(2) + '亿';
+      if (v >= 1e4) return (v/1e4).toFixed(0) + '万';
+      return v.toFixed(0);
+    }
 
     async function loadSentiment() {
       const data = await loadJSON('sentiment.json');
@@ -132,6 +187,19 @@
       document.getElementById('upRatio').textContent = `占比 ${(data.up_count / total * 100).toFixed(1)}%`;
       document.getElementById('downRatio').textContent = `占比 ${(data.down_count / total * 100).toFixed(1)}%`;
 
+      // 连板高度
+      document.getElementById('boardHeight').textContent = data.board_height || '—';
+      document.getElementById('boardHeightSub').textContent = `涨停 ${data.limit_up || 0} 家`;
+      // 涨停温度
+      document.getElementById('ztTemperature').textContent = data.limit_up || 0;
+      document.getElementById('ztTemperatureSub').textContent = `跌停 ${data.limit_down || 0} 家，涨跌比 ${data.advance_decline_ratio || '—'}`;
+
+      // 封板率估算
+      const totalBoard = (data.limit_up || 0) + (data.limit_down || 0);
+      const boardRate = totalBoard > 0 ? ((data.limit_up || 0) / totalBoard * 100).toFixed(1) : '—';
+      document.getElementById('limitUpSub').textContent = boardRate !== '—' ? `封板率 ${boardRate}%` : '封板率 --';
+      document.getElementById('limitDownSub').textContent = `含ST --`;
+
       renderIndices(data.indices);
       document.getElementById('lastUpdate').textContent = `数据更新于 ${data.updated_at || '--'}`;
     }
@@ -151,6 +219,193 @@
       `).join('');
     }
 
+    // ========== 图表 1: 大盘成交额趋势 ==========
+    async function loadTurnoverChart() {
+      const data = await loadJSON('turnover_history.json');
+      if (!data || data.length === 0) return;
+      if (!turnoverChart) {
+        turnoverChart = echarts.init(document.getElementById('turnoverChart'));
+        window.addEventListener('resize', () => turnoverChart.resize());
+      }
+      const dates = data.map(d => d.date.slice(5));
+      const amounts = data.map(d => +(d.amount / 1e8).toFixed(1));
+      turnoverChart.setOption({
+        backgroundColor: 'transparent',
+        tooltip: { trigger: 'axis', backgroundColor: '#1e1e35', borderColor: '#2a2a45',
+          textStyle: { color: '#e8e8f0', fontSize: 12 },
+          formatter: p => `<div>${p[0].axisValue}</div><div>成交额: <b>${p[0].value}亿</b></div>`
+        },
+        grid: { left: '3%', right: '3%', bottom: '8%', top: '5%', containLabel: true },
+        xAxis: { type: 'category', data: dates, axisLine: { lineStyle: { color: '#2a2a45' } },
+          axisLabel: { color: '#606078', fontSize: 10 } },
+        yAxis: { type: 'value', axisLabel: { color: '#606078', fontSize: 10, formatter: '{value}亿' },
+          splitLine: { lineStyle: { color: '#2a2a45', type: 'dashed' } },
+          min: v => v.min - (v.max - v.min) * 0.05,
+          max: v => v.max + (v.max - v.min) * 0.05 },
+        series: [{
+          type: 'line', data: amounts, smooth: true, showSymbol: false,
+          lineStyle: { width: 2, color: '#4f8cff' },
+          areaStyle: { color: { type: 'linear', x: 0, y: 0, x2: 0, y2: 1,
+              colorStops: [{ offset: 0, color: 'rgba(79,140,255,0.3)' }, { offset: 1, color: 'rgba(79,140,255,0.02)' }] } }
+        }],
+        dataZoom: [{ type: 'inside', start: 60, end: 100 }]
+      }, true);
+    }
+
+    // ========== 图表 2: 大盘情绪趋势 ==========
+    async function loadSentimentTrendChart() {
+      const data = await loadJSON('market_history.json');
+      if (!data || data.length === 0) return;
+      if (!sentimentTrendChart) {
+        sentimentTrendChart = echarts.init(document.getElementById('sentimentTrendChart'));
+        window.addEventListener('resize', () => sentimentTrendChart.resize());
+      }
+      const dates = data.map(d => d.date.slice(5));
+      const temps = data.map(d => d.temperature || 50);
+      const upRatio = data.map(d => {
+        const total = (d.up_count || 0) + (d.down_count || 0);
+        return total > 0 ? +(d.up_count / total * 100).toFixed(1) : 50;
+      });
+      sentimentTrendChart.setOption({
+        backgroundColor: 'transparent',
+        tooltip: { trigger: 'axis', backgroundColor: '#1e1e35', borderColor: '#2a2a45',
+          textStyle: { color: '#e8e8f0', fontSize: 12 },
+          formatter: p => {
+            const d = data[p[0].dataIndex];
+            return `<div style="font-weight:600">${d.date}</div>
+                    <div>情绪温度: <b>${d.temperature}°</b></div>
+                    <div>涨占比: <b>${upRatio[p[0].dataIndex]}%</b></div>
+                    <div>涨停: ${d.limit_up} | 跌停: ${d.limit_down}</div>`;
+          }
+        },
+        grid: { left: '3%', right: '3%', bottom: '8%', top: '5%', containLabel: true },
+        xAxis: { type: 'category', data: dates, axisLine: { lineStyle: { color: '#2a2a45' } },
+          axisLabel: { color: '#606078', fontSize: 10 } },
+        yAxis: { type: 'value', min: 0, max: 100,
+          axisLabel: { color: '#606078', fontSize: 10, formatter: '{value}°' },
+          splitLine: { lineStyle: { color: '#2a2a45', type: 'dashed' } } },
+        series: [{
+          type: 'line', data: temps, smooth: true, showSymbol: false,
+          lineStyle: { width: 2, color: '#ff6b6b' },
+          areaStyle: { color: { type: 'linear', x: 0, y: 0, x2: 0, y2: 1,
+              colorStops: [{ offset: 0, color: 'rgba(255,107,107,0.3)' }, { offset: 1, color: 'rgba(255,107,107,0.02)' }] } },
+          markLine: {
+            silent: true,
+            data: [{ yAxis: 30, label: { formatter: '冰点 30°', color: '#4fc3a1', fontSize: 10 } },
+                   { yAxis: 70, label: { formatter: '狂热 70°', color: '#ff6b6b', fontSize: 10 } }],
+            lineStyle: { color: '#606078', type: 'dashed', opacity: 0.5 }
+          }
+        }],
+        dataZoom: [{ type: 'inside', start: 60, end: 100 }]
+      }, true);
+    }
+
+    // ========== 图表 3: 涨跌停板分布对比 ==========
+    async function loadLimitChart() {
+      const data = await loadJSON('market_history.json');
+      if (!data || data.length === 0) return;
+      if (!limitChart) {
+        limitChart = echarts.init(document.getElementById('limitChart'));
+        window.addEventListener('resize', () => limitChart.resize());
+      }
+      const dates = data.map(d => d.date.slice(5));
+      const limitUp = data.map(d => d.limit_up || 0);
+      const limitDown = data.map(d => -Math.abs(d.limit_down || 0));
+      limitChart.setOption({
+        backgroundColor: 'transparent',
+        tooltip: { trigger: 'axis', backgroundColor: '#1e1e35', borderColor: '#2a2a45',
+          textStyle: { color: '#e8e8f0', fontSize: 12 },
+          formatter: p => {
+            const d = data[p[0].dataIndex];
+            return `<div style="font-weight:600">${d.date}</div>
+                    <div>🔴 涨停: <b style="color:#ff4d4f">${d.limit_up}</b></div>
+                    <div>🟢 跌停: <b style="color:#4fc3a1">${d.limit_down}</b></div>`;
+          }
+        },
+        grid: { left: '3%', right: '3%', bottom: '8%', top: '5%', containLabel: true },
+        xAxis: { type: 'category', data: dates, axisLine: { lineStyle: { color: '#2a2a45' } },
+          axisLabel: { color: '#606078', fontSize: 10 } },
+        yAxis: { type: 'value', axisLabel: { color: '#606078', fontSize: 10 },
+          splitLine: { lineStyle: { color: '#2a2a45', type: 'dashed' } } },
+        series: [
+          { name: '涨停', type: 'bar', data: limitUp, stack: 'total',
+            itemStyle: { color: '#ff4d4f', borderRadius: [3,3,0,0] },
+            barWidth: '60%' },
+          { name: '跌停', type: 'bar', data: limitDown, stack: 'total',
+            itemStyle: { color: '#4fc3a1', borderRadius: [0,0,3,3] },
+            barWidth: '60%' }
+        ],
+        dataZoom: [{ type: 'inside', start: 60, end: 100 }]
+      }, true);
+    }
+
+    // ========== 图表 4: 连板梯队结构 ==========
+    async function loadLadderChart() {
+      const data = await loadJSON('board_ladder.json');
+      if (!data || !data.ladder) return;
+      if (!ladderChart) {
+        ladderChart = echarts.init(document.getElementById('ladderChart'));
+        window.addEventListener('resize', () => ladderChart.resize());
+      }
+      const lbls = ['2板', '3板', '4板', '5板+'];
+      const vals = [data.ladder['2板'] || 0, data.ladder['3板'] || 0, data.ladder['4板'] || 0, data.ladder['5板+'] || 0];
+      const colors = ['#ff9f43', '#ff6b6b', '#ee5a24', '#c0392b'];
+      ladderChart.setOption({
+        backgroundColor: 'transparent',
+        tooltip: { trigger: 'axis', backgroundColor: '#1e1e35', borderColor: '#2a2a45',
+          textStyle: { color: '#e8e8f0', fontSize: 12 },
+          formatter: p => `<div style="font-weight:600">${p[0].axisValue}</div>
+                          <div>家数: <b>${p[0].value}</b></div>` },
+        grid: { left: '3%', right: '3%', bottom: '8%', top: '5%', containLabel: true },
+        xAxis: { type: 'category', data: lbls, axisLine: { lineStyle: { color: '#2a2a45' } },
+          axisLabel: { color: '#e8e8f0', fontSize: 12, fontWeight: 600 } },
+        yAxis: { type: 'value', axisLabel: { color: '#606078', fontSize: 10 },
+          splitLine: { lineStyle: { color: '#2a2a45', type: 'dashed' } } },
+        series: [{
+          type: 'bar', data: vals, barWidth: '50%',
+          itemStyle: { color: p => colors[p.dataIndex], borderRadius: [4,4,0,0] },
+          label: { show: true, position: 'top', color: '#e8e8f0', fontSize: 14, fontWeight: 700 }
+        }]
+      }, true);
+    }
+
+    // ========== 图表 5: 指数涨跌幅 ==========
+    async function loadIndexChangeChart() {
+      const data = await loadJSON('indices.json');
+      if (!data || data.length === 0) return;
+      if (!indexChangeChart) {
+        indexChangeChart = echarts.init(document.getElementById('indexChangeChart'));
+        window.addEventListener('resize', () => indexChangeChart.resize());
+      }
+      const names = data.map(d => d.name.replace('指数', ''));
+      const changes = data.map(d => d.change_pct || 0);
+      indexChangeChart.setOption({
+        backgroundColor: 'transparent',
+        tooltip: { trigger: 'axis', backgroundColor: '#1e1e35', borderColor: '#2a2a45',
+          textStyle: { color: '#e8e8f0', fontSize: 12 },
+          formatter: p => {
+            const idx = data[p[0].dataIndex];
+            return `<div style="font-weight:600">${idx.name}</div>
+                    <div>涨跌幅: <b class="${pctClass(idx.change_pct)}">${fmtPct(idx.change_pct)}</b></div>
+                    <div>最新价: ${fmtPrice(idx.price)}</div>`;
+          }
+        },
+        grid: { left: '3%', right: '3%', bottom: '8%', top: '5%', containLabel: true },
+        xAxis: { type: 'category', data: names, axisLine: { lineStyle: { color: '#2a2a45' } },
+          axisLabel: { color: '#e8e8f0', fontSize: 11, fontWeight: 600, rotate: 30 } },
+        yAxis: { type: 'value', axisLabel: { color: '#606078', fontSize: 10, formatter: '{value}%' },
+          splitLine: { lineStyle: { color: '#2a2a45', type: 'dashed' } },
+          min: v => Math.min(v.min - 0.3, -0.5), max: v => Math.max(v.max + 0.3, 0.5) },
+        series: [{
+          type: 'bar', barWidth: '50%',
+          data: changes.map((v, i) => ({ value: v, itemStyle: { color: v >= 0 ? '#ff4d4f' : '#4fc3a1', borderRadius: [3,3,0,0] } })),
+          label: { show: true, position: 'top', color: '#e8e8f0', fontSize: 12, fontWeight: 600,
+            formatter: p => (p.value > 0 ? '+' : '') + p.value.toFixed(2) + '%' }
+        }]
+      }, true);
+    }
+
+    // ========== K线图 (原有) ==========
     async function loadIndexHistory() {
       const data = await loadJSON('index_history.json');
       if (!data) return;
@@ -234,6 +489,11 @@
 
     async function init() {
       await loadSentiment();
+      loadTurnoverChart();
+      loadSentimentTrendChart();
+      loadLimitChart();
+      loadLadderChart();
+      loadIndexChangeChart();
       await loadIndexHistory();
       setInterval(loadSentiment, 300000);
     }

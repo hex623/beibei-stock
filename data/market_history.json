@@ -1,0 +1,10 @@
+[
+  {
+    "date": "2026-06-23",
+    "temperature": 50,
+    "limit_up": 0,
+    "limit_down": 0,
+    "up_count": 2385,
+    "down_count": 2385
+  }
+]
