@@ -19,6 +19,7 @@
       <a href="#" onclick="switchView('pool')" id="tab-pool">📋 股票池</a>
     </div>
     <div class="top-bar-time" id="updateTime">--</div>
+    <div class="visitor-count">👁 <span id="visitorCount">--</span></div>
   </div>
 
   <div id="market-view">
@@ -503,6 +504,28 @@
       loadIndexChangeChart();
       await loadIndexHistory();
       setInterval(loadSentiment, 300000);
+      loadVisitorCount();
+    }
+
+    // 访问量计数
+    async function loadVisitorCount() {
+      // 先显示本地计数
+      let localCount = parseInt(localStorage.getItem('bb_visit_count') || '0') + 1;
+      localStorage.setItem('bb_visit_count', localCount);
+      document.getElementById('visitorCount').textContent = localCount;
+
+      // 尝试云端计数 (countapi.xyz)
+      const key = 'beibei-stock-' + new Date().toISOString().slice(0, 7); // 按月分桶
+      try {
+        let resp = await fetch('https://api.countapi.xyz/hit/hex623/beibei-stock/' + key, { signal: AbortSignal.timeout(3000) });
+        let data = await resp.json();
+        if (data && data.value) {
+          document.getElementById('visitorCount').textContent = data.value;
+        }
+      } catch {
+        // 云端失败就用本地计数
+        document.getElementById('visitorCount').textContent = localCount;
+      }
     }
 
     init();

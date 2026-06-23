@@ -59,6 +59,23 @@
   font-family: monospace;
 }
 
+/* 访问量计数 */
+.visitor-count {
+  font-size: 13px;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 16px;
+  padding-left: 16px;
+  border-left: 1px solid var(--border-color);
+}
+#visitorCount {
+  font-family: monospace;
+  font-weight: 600;
+  color: var(--accent-blue);
+}
+
 /* 页面切换标签 */
 .top-tabs {
   display: flex; gap: 0; background: var(--bg-primary);
