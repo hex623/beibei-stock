@@ -1,12 +1,12 @@
 {
-  "sentiment_temperature": 50,
+  "sentiment_temperature": 25,
   "total_stocks": 5300,
-  "up_count": 2385,
-  "down_count": 2385,
+  "up_count": 1200,
+  "down_count": 4100,
   "flat_count": 530,
-  "limit_up": 0,
-  "limit_down": 0,
-  "advance_decline_ratio": "—",
+  "limit_up": 15,
+  "limit_down": 125,
+  "advance_decline_ratio": 0.29,
   "total_amount": "—",
   "indices": [
     {
