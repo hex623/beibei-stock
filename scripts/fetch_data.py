@@ -192,7 +192,7 @@ def fetch_sentiment(indices):
         "indices": indices or [],
         "updated_at": time.strftime("%Y-%m-%d %H:%M:%S"),
     }
-    print(f"  -> 温度 {result['sentiment_temperature']}° | 涨{result['up_count']}/跌{result['down_count']}")
+    print(f"  -> 温度 {result['sentiment_temperature']}° | 涨{result['up_count']}/跌{result['down_count']} | 成交额{total_amount_str}")
     return result
 
 
