@@ -45,10 +45,10 @@
   },
   {
     "date": "2026-06-24",
-    "temperature": 17,
-    "limit_up": 99,
-    "limit_down": 18,
-    "up_count": 997,
-    "down_count": 4869
+    "temperature": 70,
+    "limit_up": 156,
+    "limit_down": 17,
+    "up_count": 3700,
+    "down_count": 1600
   }
 ]
