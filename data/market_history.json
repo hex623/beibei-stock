@@ -50,5 +50,13 @@
     "limit_down": 17,
     "up_count": 3700,
     "down_count": 1600
+  },
+  {
+    "date": "2026-06-25",
+    "temperature": 70,
+    "limit_up": 156,
+    "limit_down": 17,
+    "up_count": 3700,
+    "down_count": 1600
   }
 ]
