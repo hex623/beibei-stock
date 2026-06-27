@@ -1,13 +1,13 @@
 {
-  "sentiment_temperature": 70,
-  "total_stocks": 5300,
-  "up_count": 3700,
-  "down_count": 1600,
-  "flat_count": 0,
-  "limit_up": 156,
-  "limit_down": 17,
-  "advance_decline_ratio": 2.31,
-  "total_amount": "21960亿",
+  "sentiment_temperature": 13,
+  "total_stocks": 5867,
+  "up_count": 790,
+  "down_count": 4676,
+  "flat_count": 401,
+  "limit_up": 89,
+  "limit_down": 81,
+  "advance_decline_ratio": 0.17,
+  "total_amount": "35524亿",
   "board_height": "—",
   "indices": [
     {
@@ -99,6 +99,5 @@
       "low": 8563.7
     }
   ],
-  "updated_at": "2026-06-26 08:39:54",
-  "note": "数据源于2026-06-25（实时数据不可用）"
+  "updated_at": "2026-06-27 07:40:59"
 }

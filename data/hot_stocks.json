@@ -1,452 +1,452 @@
 [
   {
-    "code": "603986",
-    "name": "兆易创新",
-    "price": 662.2,
-    "change_pct": 3.31,
-    "change_amount": 21.21,
-    "amount": "242.66亿",
-    "turnover": 5.54
-  },
-  {
-    "code": "600584",
-    "name": "长电科技",
-    "price": 94.7,
-    "change_pct": 10.0,
-    "change_amount": 8.61,
-    "amount": "233.02亿",
-    "turnover": 14.09
-  },
-  {
     "code": "300308",
     "name": "中际旭创",
-    "price": 1291.11,
-    "change_pct": -1.44,
-    "change_amount": -18.9,
-    "amount": "221.85亿",
-    "turnover": 1.52
+    "price": 1253.89,
+    "change_pct": -5.25,
+    "change_amount": -69.51,
+    "amount": "444.81亿",
+    "turnover": 3.18
   },
   {
-    "code": "002475",
-    "name": "立讯精密",
-    "price": 76.25,
-    "change_pct": 9.93,
-    "change_amount": 6.89,
-    "amount": "186.58亿",
-    "turnover": 3.58
+    "code": "603986",
+    "name": "兆易创新",
+    "price": 770.0,
+    "change_pct": -0.67,
+    "change_amount": -5.21,
+    "amount": "374.18亿",
+    "turnover": 7.39
   },
   {
     "code": "000725",
     "name": "京东方Ａ",
-    "price": 6.91,
-    "change_pct": 2.07,
-    "change_amount": 0.14,
-    "amount": "172.88亿",
-    "turnover": 7.05
+    "price": 7.79,
+    "change_pct": 3.59,
+    "change_amount": 0.27,
+    "amount": "356.77亿",
+    "turnover": 12.79
   },
   {
     "code": "300502",
     "name": "新易盛",
-    "price": 548.52,
-    "change_pct": -0.63,
-    "change_amount": -3.48,
-    "amount": "157.57亿",
-    "turnover": 2.24
+    "price": 566.0,
+    "change_pct": -7.29,
+    "change_amount": -44.49,
+    "amount": "352.83亿",
+    "turnover": 4.93
   },
   {
-    "code": "688981",
-    "name": "中芯国际",
-    "price": 153.01,
-    "change_pct": 7.98,
-    "change_amount": 11.31,
-    "amount": "148.24亿",
-    "turnover": 4.99
-  },
-  {
-    "code": "600487",
-    "name": "亨通光电",
-    "price": 116.86,
-    "change_pct": -0.38,
-    "change_amount": -0.45,
-    "amount": "137.33亿",
-    "turnover": 4.8
+    "code": "600584",
+    "name": "长电科技",
+    "price": 100.89,
+    "change_pct": -3.15,
+    "change_amount": -3.28,
+    "amount": "352.29亿",
+    "turnover": 18.77
   },
   {
     "code": "600522",
     "name": "中天科技",
-    "price": 61.18,
-    "change_pct": -0.89,
-    "change_amount": -0.55,
-    "amount": "131.61亿",
-    "turnover": 6.24
+    "price": 61.29,
+    "change_pct": -10.0,
+    "change_amount": -6.81,
+    "amount": "248.99亿",
+    "turnover": 11.59
   },
   {
-    "code": "002008",
-    "name": "大族激光",
-    "price": 151.99,
-    "change_pct": 4.74,
-    "change_amount": 6.88,
-    "amount": "122.10亿",
-    "turnover": 8.8
+    "code": "002475",
+    "name": "立讯精密",
+    "price": 68.0,
+    "change_pct": -8.63,
+    "change_amount": -6.42,
+    "amount": "233.14亿",
+    "turnover": 4.66
   },
   {
-    "code": "002428",
-    "name": "云南锗业",
-    "price": 121.65,
-    "change_pct": 8.71,
-    "change_amount": 9.75,
-    "amount": "120.33亿",
-    "turnover": 15.84
-  },
-  {
-    "code": "688256",
-    "name": "寒武纪",
-    "price": 1450.57,
-    "change_pct": 2.66,
-    "change_amount": 37.57,
-    "amount": "119.51亿",
-    "turnover": 1.34
-  },
-  {
-    "code": "300059",
-    "name": "东方财富",
-    "price": 20.21,
-    "change_pct": -3.3,
-    "change_amount": -0.69,
-    "amount": "105.66亿",
-    "turnover": 3.85
-  },
-  {
-    "code": "002156",
-    "name": "通富微电",
-    "price": 73.34,
-    "change_pct": 7.19,
-    "change_amount": 4.92,
-    "amount": "104.68亿",
-    "turnover": 9.65
-  },
-  {
-    "code": "600176",
-    "name": "中国巨石",
-    "price": 64.82,
-    "change_pct": 9.99,
-    "change_amount": 5.89,
-    "amount": "103.20亿",
-    "turnover": 4.08
-  },
-  {
-    "code": "600183",
-    "name": "生益科技",
-    "price": 176.73,
-    "change_pct": 5.28,
-    "change_amount": 8.86,
-    "amount": "102.54亿",
-    "turnover": 2.46
-  },
-  {
-    "code": "688008",
-    "name": "澜起科技",
-    "price": 260.37,
-    "change_pct": 0.92,
-    "change_amount": 2.37,
-    "amount": "100.95亿",
-    "turnover": 3.4
-  },
-  {
-    "code": "001309",
-    "name": "德明利",
-    "price": 788.0,
-    "change_pct": 4.37,
-    "change_amount": 32.99,
-    "amount": "99.78亿",
-    "turnover": 7.76
-  },
-  {
-    "code": "002384",
-    "name": "东山精密",
-    "price": 254.9,
-    "change_pct": -0.05,
-    "change_amount": -0.12,
-    "amount": "97.20亿",
-    "turnover": 2.74
-  },
-  {
-    "code": "603259",
-    "name": "药明康德",
-    "price": 115.41,
-    "change_pct": 8.56,
-    "change_amount": 9.1,
-    "amount": "91.87亿",
-    "turnover": 3.26
+    "code": "600487",
+    "name": "亨通光电",
+    "price": 110.81,
+    "change_pct": -9.91,
+    "change_amount": -12.19,
+    "amount": "227.20亿",
+    "turnover": 8.13
   },
   {
     "code": "688525",
     "name": "佰维存储",
-    "price": 396.16,
-    "change_pct": 1.72,
-    "change_amount": 6.69,
-    "amount": "89.13亿",
-    "turnover": 4.82
+    "price": 501.05,
+    "change_pct": 4.32,
+    "change_amount": 20.75,
+    "amount": "224.48亿",
+    "turnover": 9.85
   },
   {
-    "code": "600105",
-    "name": "永鼎股份",
-    "price": 68.09,
-    "change_pct": 8.96,
-    "change_amount": 5.6,
-    "amount": "89.12亿",
-    "turnover": 9.1
+    "code": "688008",
+    "name": "澜起科技",
+    "price": 261.82,
+    "change_pct": -6.21,
+    "change_amount": -17.34,
+    "amount": "200.75亿",
+    "turnover": 6.59
   },
   {
-    "code": "000657",
-    "name": "中钨高新",
-    "price": 99.01,
-    "change_pct": -3.4,
-    "change_amount": -3.49,
-    "amount": "89.11亿",
-    "turnover": 6.23
+    "code": "001309",
+    "name": "德明利",
+    "price": 951.0,
+    "change_pct": 6.73,
+    "change_amount": 60.0,
+    "amount": "199.76亿",
+    "turnover": 13.26
+  },
+  {
+    "code": "002008",
+    "name": "大族激光",
+    "price": 151.27,
+    "change_pct": -1.0,
+    "change_amount": -1.53,
+    "amount": "199.61亿",
+    "turnover": 13.19
   },
   {
     "code": "601138",
     "name": "工业富联",
-    "price": 75.59,
-    "change_pct": 2.01,
-    "change_amount": 1.49,
-    "amount": "87.07亿",
-    "turnover": 0.59
+    "price": 70.22,
+    "change_pct": -8.79,
+    "change_amount": -6.77,
+    "amount": "189.33亿",
+    "turnover": 1.32
   },
   {
-    "code": "002185",
-    "name": "华天科技",
-    "price": 20.76,
-    "change_pct": 6.24,
-    "change_amount": 1.22,
-    "amount": "81.69亿",
-    "turnover": 12.08
+    "code": "688256",
+    "name": "寒武纪",
+    "price": 1458.0,
+    "change_pct": -3.12,
+    "change_amount": -47.0,
+    "amount": "182.44亿",
+    "turnover": 1.98
   },
   {
-    "code": "300285",
-    "name": "国瓷材料",
-    "price": 90.03,
-    "change_pct": -0.83,
-    "change_amount": -0.75,
-    "amount": "81.67亿",
-    "turnover": 10.42
-  },
-  {
-    "code": "300394",
-    "name": "天孚通信",
-    "price": 307.4,
-    "change_pct": -1.18,
-    "change_amount": -3.66,
-    "amount": "80.96亿",
-    "turnover": 2.39
-  },
-  {
-    "code": "000021",
-    "name": "深科技",
-    "price": 49.88,
-    "change_pct": 9.15,
-    "change_amount": 4.18,
-    "amount": "80.83亿",
-    "turnover": 10.77
-  },
-  {
-    "code": "300476",
-    "name": "胜宏科技",
-    "price": 337.44,
-    "change_pct": -0.22,
-    "change_amount": -0.76,
-    "amount": "79.79亿",
-    "turnover": 2.74
+    "code": "002384",
+    "name": "东山精密",
+    "price": 260.32,
+    "change_pct": -5.61,
+    "change_amount": -15.48,
+    "amount": "181.83亿",
+    "turnover": 4.98
   },
   {
     "code": "300750",
     "name": "宁德时代",
-    "price": 394.54,
-    "change_pct": 0.52,
-    "change_amount": 2.03,
-    "amount": "78.30亿",
-    "turnover": 0.47
+    "price": 381.0,
+    "change_pct": -5.2,
+    "change_amount": -20.9,
+    "amount": "181.34亿",
+    "turnover": 1.09
   },
   {
-    "code": "300475",
-    "name": "香农芯创",
-    "price": 283.02,
-    "change_pct": -0.17,
-    "change_amount": -0.49,
-    "amount": "76.19亿",
-    "turnover": 5.94
+    "code": "300476",
+    "name": "胜宏科技",
+    "price": 319.55,
+    "change_pct": -8.74,
+    "change_amount": -30.61,
+    "amount": "180.16亿",
+    "turnover": 6.36
   },
   {
-    "code": "300857",
-    "name": "协创数据",
-    "price": 334.12,
-    "change_pct": 9.01,
-    "change_amount": 27.62,
-    "amount": "75.56亿",
-    "turnover": 4.8
-  },
-  {
-    "code": "688797",
-    "name": "N臻宝",
-    "price": 467.0,
-    "change_pct": 948.03,
-    "change_amount": 422.44,
-    "amount": "75.01亿",
-    "turnover": 60.83
-  },
-  {
-    "code": "300604",
-    "name": "长川科技",
-    "price": 296.3,
-    "change_pct": 6.05,
-    "change_amount": 16.9,
-    "amount": "74.43亿",
-    "turnover": 5.33
+    "code": "600176",
+    "name": "中国巨石",
+    "price": 74.12,
+    "change_pct": 4.69,
+    "change_amount": 3.32,
+    "amount": "166.28亿",
+    "turnover": 5.67
   },
   {
     "code": "301308",
     "name": "江波龙",
-    "price": 603.3,
-    "change_pct": 1.22,
-    "change_amount": 7.29,
-    "amount": "72.67亿",
-    "turnover": 4.33
+    "price": 679.6,
+    "change_pct": 0.34,
+    "change_amount": 2.3,
+    "amount": "166.00亿",
+    "turnover": 8.78
   },
   {
-    "code": "002281",
-    "name": "光迅科技",
-    "price": 262.32,
-    "change_pct": -1.72,
-    "change_amount": -4.58,
-    "amount": "71.77亿",
-    "turnover": 3.46
+    "code": "688981",
+    "name": "中芯国际",
+    "price": 148.76,
+    "change_pct": -5.16,
+    "change_amount": -8.1,
+    "amount": "161.72亿",
+    "turnover": 5.38
   },
   {
-    "code": "601869",
-    "name": "长飞光纤",
-    "price": 558.01,
-    "change_pct": -2.2,
-    "change_amount": -12.57,
-    "amount": "71.21亿",
-    "turnover": 3.08
+    "code": "300394",
+    "name": "天孚通信",
+    "price": 318.0,
+    "change_pct": -7.01,
+    "change_amount": -23.97,
+    "amount": "156.62亿",
+    "turnover": 4.43
+  },
+  {
+    "code": "002185",
+    "name": "华天科技",
+    "price": 22.56,
+    "change_pct": 0.71,
+    "change_amount": 0.16,
+    "amount": "150.98亿",
+    "turnover": 19.84
+  },
+  {
+    "code": "603019",
+    "name": "中科曙光",
+    "price": 98.76,
+    "change_pct": 0.96,
+    "change_amount": 0.94,
+    "amount": "149.49亿",
+    "turnover": 10.31
+  },
+  {
+    "code": "002156",
+    "name": "通富微电",
+    "price": 71.6,
+    "change_pct": -7.98,
+    "change_amount": -6.21,
+    "amount": "146.24亿",
+    "turnover": 12.97
+  },
+  {
+    "code": "600667",
+    "name": "太极实业",
+    "price": 26.88,
+    "change_pct": 6.2,
+    "change_amount": 1.57,
+    "amount": "144.89亿",
+    "turnover": 25.24
+  },
+  {
+    "code": "300285",
+    "name": "国瓷材料",
+    "price": 102.81,
+    "change_pct": 4.48,
+    "change_amount": 4.41,
+    "amount": "141.96亿",
+    "turnover": 16.55
+  },
+  {
+    "code": "300136",
+    "name": "信维通信",
+    "price": 118.19,
+    "change_pct": 1.25,
+    "change_amount": 1.46,
+    "amount": "138.22亿",
+    "turnover": 14.24
   },
   {
     "code": "688041",
     "name": "海光信息",
-    "price": 322.51,
-    "change_pct": 1.74,
-    "change_amount": 5.51,
-    "amount": "70.43亿",
-    "turnover": 0.95
+    "price": 344.9,
+    "change_pct": -4.27,
+    "change_amount": -15.38,
+    "amount": "138.18亿",
+    "turnover": 1.71
   },
   {
-    "code": "600498",
-    "name": "烽火通信",
-    "price": 80.04,
-    "change_pct": -3.27,
-    "change_amount": -2.71,
-    "amount": "68.46亿",
-    "turnover": 6.59
+    "code": "300223",
+    "name": "北京君正",
+    "price": 233.21,
+    "change_pct": -1.75,
+    "change_amount": -4.15,
+    "amount": "137.41亿",
+    "turnover": 13.83
   },
   {
-    "code": "600549",
-    "name": "厦门钨业",
-    "price": 83.0,
-    "change_pct": -2.84,
-    "change_amount": -2.43,
-    "amount": "68.20亿",
-    "turnover": 5.26
+    "code": "002281",
+    "name": "光迅科技",
+    "price": 240.34,
+    "change_pct": -8.08,
+    "change_amount": -21.12,
+    "amount": "135.28亿",
+    "turnover": 7.07
   },
   {
-    "code": "301526",
-    "name": "国际复材",
-    "price": 44.33,
-    "change_pct": 15.9,
-    "change_amount": 6.08,
-    "amount": "67.26亿",
-    "turnover": 11.29
+    "code": "300475",
+    "name": "香农芯创",
+    "price": 301.0,
+    "change_pct": -1.71,
+    "change_amount": -5.25,
+    "amount": "134.01亿",
+    "turnover": 9.71
+  },
+  {
+    "code": "000100",
+    "name": "TCL科技",
+    "price": 5.4,
+    "change_pct": 1.12,
+    "change_amount": 0.06,
+    "amount": "133.20亿",
+    "turnover": 12.76
   },
   {
     "code": "688012",
     "name": "中微公司",
-    "price": 384.41,
-    "change_pct": 3.41,
-    "change_amount": 12.69,
-    "amount": "66.76亿",
-    "turnover": 1.91
+    "price": 413.0,
+    "change_pct": 3.48,
+    "change_amount": 13.87,
+    "amount": "131.53亿",
+    "turnover": 3.39
   },
   {
-    "code": "688347",
-    "name": "华虹宏力",
-    "price": 318.21,
-    "change_pct": 8.95,
-    "change_amount": 26.13,
-    "amount": "66.44亿",
-    "turnover": 5.3
+    "code": "001399",
+    "name": "N惠科",
+    "price": 42.0,
+    "change_pct": 315.02,
+    "change_amount": 31.88,
+    "amount": "130.31亿",
+    "turnover": 65.92
   },
   {
-    "code": "002407",
-    "name": "多氟多",
-    "price": 43.84,
-    "change_pct": 4.88,
-    "change_amount": 2.04,
-    "amount": "66.40亿",
-    "turnover": 14.61
+    "code": "300059",
+    "name": "东方财富",
+    "price": 20.07,
+    "change_pct": -4.93,
+    "change_amount": -1.04,
+    "amount": "127.55亿",
+    "turnover": 4.66
   },
   {
-    "code": "603083",
-    "name": "剑桥科技",
-    "price": 260.56,
-    "change_pct": 9.31,
-    "change_amount": 22.19,
-    "amount": "66.28亿",
-    "turnover": 9.39
+    "code": "600183",
+    "name": "生益科技",
+    "price": 178.5,
+    "change_pct": -4.65,
+    "change_amount": -8.7,
+    "amount": "126.98亿",
+    "turnover": 2.99
   },
   {
-    "code": "002436",
-    "name": "兴森科技",
-    "price": 49.64,
-    "change_pct": 2.35,
-    "change_amount": 1.14,
-    "amount": "64.03亿",
-    "turnover": 8.4
+    "code": "000021",
+    "name": "深科技",
+    "price": 53.51,
+    "change_pct": 0.58,
+    "change_amount": 0.31,
+    "amount": "124.63亿",
+    "turnover": 14.44
   },
   {
-    "code": "002837",
-    "name": "英维克",
-    "price": 83.01,
-    "change_pct": 1.88,
-    "change_amount": 1.53,
-    "amount": "63.61亿",
-    "turnover": 7.0
+    "code": "002428",
+    "name": "云南锗业",
+    "price": 120.48,
+    "change_pct": -7.39,
+    "change_amount": -9.62,
+    "amount": "122.88亿",
+    "turnover": 15.2
   },
   {
     "code": "002463",
     "name": "沪电股份",
-    "price": 140.96,
-    "change_pct": 1.78,
-    "change_amount": 2.46,
-    "amount": "62.29亿",
-    "turnover": 2.3
+    "price": 147.28,
+    "change_pct": -4.97,
+    "change_amount": -7.71,
+    "amount": "121.99亿",
+    "turnover": 4.27
+  },
+  {
+    "code": "600703",
+    "name": "三安光电",
+    "price": 21.73,
+    "change_pct": 0.28,
+    "change_amount": 0.06,
+    "amount": "120.74亿",
+    "turnover": 10.89
+  },
+  {
+    "code": "300408",
+    "name": "三环集团",
+    "price": 160.05,
+    "change_pct": -2.18,
+    "change_amount": -3.57,
+    "amount": "119.36亿",
+    "turnover": 4.0
+  },
+  {
+    "code": "300274",
+    "name": "阳光电源",
+    "price": 151.05,
+    "change_pct": -1.05,
+    "change_amount": -1.61,
+    "amount": "117.24亿",
+    "turnover": 4.77
+  },
+  {
+    "code": "300604",
+    "name": "长川科技",
+    "price": 314.9,
+    "change_pct": 1.58,
+    "change_amount": 4.91,
+    "amount": "112.88亿",
+    "turnover": 7.18
   },
   {
     "code": "000636",
     "name": "风华高科",
-    "price": 72.26,
-    "change_pct": 2.92,
-    "change_amount": 2.05,
-    "amount": "62.29亿",
-    "turnover": 7.56
+    "price": 78.5,
+    "change_pct": -1.41,
+    "change_amount": -1.12,
+    "amount": "111.87亿",
+    "turnover": 12.27
   },
   {
-    "code": "301217",
-    "name": "铜冠铜箔",
-    "price": 185.78,
-    "change_pct": 8.13,
-    "change_amount": 13.97,
-    "amount": "61.99亿",
-    "turnover": 4.12
+    "code": "000988",
+    "name": "华工科技",
+    "price": 160.94,
+    "change_pct": -7.28,
+    "change_amount": -12.64,
+    "amount": "110.14亿",
+    "turnover": 6.65
+  },
+  {
+    "code": "300433",
+    "name": "蓝思科技",
+    "price": 55.59,
+    "change_pct": -0.23,
+    "change_amount": -0.13,
+    "amount": "103.38亿",
+    "turnover": 3.74
+  },
+  {
+    "code": "600105",
+    "name": "永鼎股份",
+    "price": 65.71,
+    "change_pct": -9.94,
+    "change_amount": -7.25,
+    "amount": "103.21亿",
+    "turnover": 10.43
+  },
+  {
+    "code": "002371",
+    "name": "北方华创",
+    "price": 813.37,
+    "change_pct": 1.93,
+    "change_amount": 15.37,
+    "amount": "100.09亿",
+    "turnover": 1.71
+  },
+  {
+    "code": "605358",
+    "name": "立昂微",
+    "price": 75.37,
+    "change_pct": 6.91,
+    "change_amount": 4.87,
+    "amount": "97.90亿",
+    "turnover": 17.22
+  },
+  {
+    "code": "000657",
+    "name": "中钨高新",
+    "price": 99.51,
+    "change_pct": -5.84,
+    "change_amount": -6.17,
+    "amount": "96.92亿",
+    "turnover": 6.45
   }
 ]

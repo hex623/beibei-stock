@@ -1,902 +1,902 @@
 [
   {
-    "name": "玻纤制造",
-    "code": "BK1462",
-    "change_pct": 7.17,
-    "amount": "278.39亿",
-    "up_count": 8,
-    "down_count": 0,
-    "lead_stock": 9.99
-  },
-  {
-    "name": "集成电路封测",
-    "code": "BK1328",
-    "change_pct": 6.4,
-    "amount": "552.98亿",
-    "up_count": 13,
-    "down_count": 0,
-    "lead_stock": 19.99
-  },
-  {
-    "name": "锂",
-    "code": "BK1621",
-    "change_pct": 6.27,
-    "amount": "166.17亿",
-    "up_count": 8,
-    "down_count": 0,
-    "lead_stock": 10.02
-  },
-  {
-    "name": "集成电路制造",
-    "code": "BK1329",
-    "change_pct": 5.59,
-    "amount": "351.89亿",
-    "up_count": 8,
-    "down_count": 0,
-    "lead_stock": 9.16
-  },
-  {
-    "name": "能源金属",
-    "code": "BK1015",
-    "change_pct": 5.12,
-    "amount": "196.61亿",
-    "up_count": 11,
-    "down_count": 0,
-    "lead_stock": 10.02
-  },
-  {
-    "name": "半导体设备",
-    "code": "BK1326",
-    "change_pct": 5.09,
-    "amount": "447.03亿",
-    "up_count": 22,
-    "down_count": 0,
-    "lead_stock": 10.01
-  },
-  {
     "name": "橡胶助剂",
     "code": "BK1443",
-    "change_pct": 4.29,
-    "amount": "28.35亿",
-    "up_count": 1,
-    "down_count": 1,
-    "lead_stock": 10.0
-  },
-  {
-    "name": "氟化工",
-    "code": "BK1424",
-    "change_pct": 3.8,
-    "amount": "195.66亿",
-    "up_count": 8,
-    "down_count": 2,
-    "lead_stock": 9.99
-  },
-  {
-    "name": "氨纶",
-    "code": "BK1412",
-    "change_pct": 3.44,
-    "amount": "4.43亿",
-    "up_count": 1,
-    "down_count": 0,
-    "lead_stock": 3.44
-  },
-  {
-    "name": "国际工程",
-    "code": "BK1475",
-    "change_pct": 3.04,
-    "amount": "14.46亿",
-    "up_count": 3,
-    "down_count": 1,
-    "lead_stock": 10.01
-  },
-  {
-    "name": "钾肥",
-    "code": "BK1434",
-    "change_pct": 2.87,
-    "amount": "37.22亿",
-    "up_count": 4,
-    "down_count": 0,
-    "lead_stock": 6.15
-  },
-  {
-    "name": "医疗研发外包",
-    "code": "BK1600",
-    "change_pct": 2.73,
-    "amount": "190.54亿",
-    "up_count": 24,
-    "down_count": 5,
-    "lead_stock": 10.0
-  },
-  {
-    "name": "磷肥及磷化工",
-    "code": "BK1435",
-    "change_pct": 2.67,
-    "amount": "76.71亿",
-    "up_count": 6,
-    "down_count": 3,
-    "lead_stock": 9.99
-  },
-  {
-    "name": "镍",
-    "code": "BK1622",
-    "change_pct": 2.61,
-    "amount": "22.84亿",
-    "up_count": 1,
-    "down_count": 0,
-    "lead_stock": 2.61
-  },
-  {
-    "name": "半导体",
-    "code": "BK1036",
-    "change_pct": 2.42,
-    "amount": "3607.36亿",
-    "up_count": 121,
-    "down_count": 54,
-    "lead_stock": 19.99
-  },
-  {
-    "name": "印制电路板",
-    "code": "BK1340",
-    "change_pct": 2.28,
-    "amount": "833.86亿",
-    "up_count": 29,
-    "down_count": 18,
-    "lead_stock": 19.99
-  },
-  {
-    "name": "数字芯片设计",
-    "code": "BK1331",
-    "change_pct": 2.08,
-    "amount": "1281.00亿",
-    "up_count": 39,
-    "down_count": 12,
-    "lead_stock": 18.44
-  },
-  {
-    "name": "元件",
-    "code": "BK0459",
-    "change_pct": 1.93,
-    "amount": "1164.73亿",
-    "up_count": 40,
-    "down_count": 26,
-    "lead_stock": 19.99
-  },
-  {
-    "name": "半导体材料",
-    "code": "BK1325",
-    "change_pct": 1.9,
-    "amount": "460.35亿",
-    "up_count": 18,
-    "down_count": 12,
-    "lead_stock": 9.45
-  },
-  {
-    "name": "钴",
-    "code": "BK1620",
-    "change_pct": 1.79,
-    "amount": "7.60亿",
+    "change_pct": 5.41,
+    "amount": "33.21亿",
     "up_count": 2,
     "down_count": 0,
-    "lead_stock": 2.01
-  },
-  {
-    "name": "电子化学品Ⅲ",
-    "code": "BK1332",
-    "change_pct": 1.71,
-    "amount": "511.02亿",
-    "up_count": 21,
-    "down_count": 15,
-    "lead_stock": 9.98
-  },
-  {
-    "name": "电子化学品Ⅱ",
-    "code": "BK1039",
-    "change_pct": 1.71,
-    "amount": "511.02亿",
-    "up_count": 21,
-    "down_count": 15,
-    "lead_stock": 9.98
-  },
-  {
-    "name": "铅锌",
-    "code": "BK1614",
-    "change_pct": 1.67,
-    "amount": "150.98亿",
-    "up_count": 8,
-    "down_count": 4,
     "lead_stock": 10.0
-  },
-  {
-    "name": "炼油化工",
-    "code": "BK1569",
-    "change_pct": 1.34,
-    "amount": "50.42亿",
-    "up_count": 6,
-    "down_count": 4,
-    "lead_stock": 10.01
-  },
-  {
-    "name": "粘胶",
-    "code": "BK1416",
-    "change_pct": 1.3,
-    "amount": "7.10亿",
-    "up_count": 1,
-    "down_count": 1,
-    "lead_stock": 8.07
-  },
-  {
-    "name": "玻璃玻纤",
-    "code": "BK0546",
-    "change_pct": 1.1,
-    "amount": "301.34亿",
-    "up_count": 8,
-    "down_count": 9,
-    "lead_stock": 9.99
-  },
-  {
-    "name": "被动元件",
-    "code": "BK1339",
-    "change_pct": 1.07,
-    "amount": "330.87亿",
-    "up_count": 11,
-    "down_count": 8,
-    "lead_stock": 10.0
-  },
-  {
-    "name": "航空运输",
-    "code": "BK1479",
-    "change_pct": 1.02,
-    "amount": "27.78亿",
-    "up_count": 6,
-    "down_count": 3,
-    "lead_stock": 4.03
-  },
-  {
-    "name": "光学元件",
-    "code": "BK1334",
-    "change_pct": 1.0,
-    "amount": "161.02亿",
-    "up_count": 17,
-    "down_count": 9,
-    "lead_stock": 14.43
-  },
-  {
-    "name": "航海装备Ⅲ",
-    "code": "BK1383",
-    "change_pct": 0.98,
-    "amount": "44.80亿",
-    "up_count": 3,
-    "down_count": 7,
-    "lead_stock": 12.76
-  },
-  {
-    "name": "航海装备Ⅱ",
-    "code": "BK1230",
-    "change_pct": 0.98,
-    "amount": "44.80亿",
-    "up_count": 3,
-    "down_count": 7,
-    "lead_stock": 12.76
-  },
-  {
-    "name": "辅料",
-    "code": "BK1348",
-    "change_pct": 0.79,
-    "amount": "1.07亿",
-    "up_count": 1,
-    "down_count": 3,
-    "lead_stock": 10.02
-  },
-  {
-    "name": "电子",
-    "code": "BK1201",
-    "change_pct": 0.78,
-    "amount": "7125.52亿",
-    "up_count": 255,
-    "down_count": 250,
-    "lead_stock": 9.98
-  },
-  {
-    "name": "医疗服务",
-    "code": "BK0727",
-    "change_pct": 0.58,
-    "amount": "240.45亿",
-    "up_count": 29,
-    "down_count": 25,
-    "lead_stock": 10.0
-  },
-  {
-    "name": "模拟芯片设计",
-    "code": "BK1330",
-    "change_pct": 0.45,
-    "amount": "188.27亿",
-    "up_count": 14,
-    "down_count": 21,
-    "lead_stock": 15.18
-  },
-  {
-    "name": "运动服装",
-    "code": "BK1355",
-    "change_pct": 0.43,
-    "amount": "19.30亿",
-    "up_count": 1,
-    "down_count": 3,
-    "lead_stock": 12.82
-  },
-  {
-    "name": "其他专业工程",
-    "code": "BK1477",
-    "change_pct": 0.43,
-    "amount": "78.72亿",
-    "up_count": 7,
-    "down_count": 13,
-    "lead_stock": 10.0
-  },
-  {
-    "name": "分立器件",
-    "code": "BK1327",
-    "change_pct": 0.42,
-    "amount": "325.84亿",
-    "up_count": 7,
-    "down_count": 9,
-    "lead_stock": 10.85
-  },
-  {
-    "name": "航运",
-    "code": "BK1482",
-    "change_pct": 0.4,
-    "amount": "85.73亿",
-    "up_count": 6,
-    "down_count": 13,
-    "lead_stock": 9.99
-  },
-  {
-    "name": "其他化学纤维",
-    "code": "BK1415",
-    "change_pct": 0.39,
-    "amount": "24.94亿",
-    "up_count": 4,
-    "down_count": 4,
-    "lead_stock": 10.02
-  },
-  {
-    "name": "激光设备",
-    "code": "BK1409",
-    "change_pct": 0.27,
-    "amount": "231.82亿",
-    "up_count": 4,
-    "down_count": 6,
-    "lead_stock": 9.41
-  },
-  {
-    "name": "个护小家电",
-    "code": "BK1458",
-    "change_pct": 0.25,
-    "amount": "2.25亿",
-    "up_count": 1,
-    "down_count": 3,
-    "lead_stock": 13.27
-  },
-  {
-    "name": "综合电商",
-    "code": "BK1548",
-    "change_pct": 0.24,
-    "amount": "3.23亿",
-    "up_count": 1,
-    "down_count": 2,
-    "lead_stock": 1.96
-  },
-  {
-    "name": "航空机场",
-    "code": "BK0420",
-    "change_pct": 0.22,
-    "amount": "32.07亿",
-    "up_count": 6,
-    "down_count": 8,
-    "lead_stock": 4.03
-  },
-  {
-    "name": "化学纤维",
-    "code": "BK0471",
-    "change_pct": 0.18,
-    "amount": "49.77亿",
-    "up_count": 12,
-    "down_count": 14,
-    "lead_stock": 10.02
-  },
-  {
-    "name": "其他数字媒体",
-    "code": "BK1295",
-    "change_pct": 0.17,
-    "amount": "10.93亿",
-    "up_count": 1,
-    "down_count": 1,
-    "lead_stock": 3.98
   },
   {
     "name": "有机硅",
     "code": "BK1431",
-    "change_pct": 0.05,
-    "amount": "27.67亿",
-    "up_count": 4,
-    "down_count": 6,
-    "lead_stock": 7.17
-  },
-  {
-    "name": "农化制品",
-    "code": "BK0731",
-    "change_pct": 0.02,
-    "amount": "176.61亿",
-    "up_count": 30,
-    "down_count": 33,
-    "lead_stock": 9.99
-  },
-  {
-    "name": "化学制剂",
-    "code": "BK1594",
-    "change_pct": 0.02,
-    "amount": "264.21亿",
-    "up_count": 48,
-    "down_count": 62,
-    "lead_stock": 9.98
-  },
-  {
-    "name": "复合肥",
-    "code": "BK1433",
-    "change_pct": -0.02,
-    "amount": "10.69亿",
-    "up_count": 5,
-    "down_count": 5,
-    "lead_stock": 5.23
-  },
-  {
-    "name": "涤纶",
-    "code": "BK1413",
-    "change_pct": -0.08,
-    "amount": "9.84亿",
-    "up_count": 4,
-    "down_count": 6,
-    "lead_stock": 9.98
-  },
-  {
-    "name": "膜材料",
-    "code": "BK1439",
-    "change_pct": -0.09,
-    "amount": "131.59亿",
+    "change_pct": 4.72,
+    "amount": "67.74亿",
     "up_count": 8,
-    "down_count": 13,
-    "lead_stock": 10.0
-  },
-  {
-    "name": "其他生物制品",
-    "code": "BK1596",
-    "change_pct": -0.1,
-    "amount": "74.33亿",
-    "up_count": 15,
-    "down_count": 22,
-    "lead_stock": 7.2
-  },
-  {
-    "name": "军工电子Ⅲ",
-    "code": "BK1386",
-    "change_pct": -0.13,
-    "amount": "209.95亿",
-    "up_count": 24,
-    "down_count": 39,
-    "lead_stock": 10.01
-  },
-  {
-    "name": "军工电子Ⅱ",
-    "code": "BK1233",
-    "change_pct": -0.13,
-    "amount": "209.95亿",
-    "up_count": 24,
-    "down_count": 39,
-    "lead_stock": 10.01
-  },
-  {
-    "name": "跨境电商",
-    "code": "BK1547",
-    "change_pct": -0.15,
-    "amount": "13.51亿",
-    "up_count": 3,
-    "down_count": 4,
+    "down_count": 2,
     "lead_stock": 10.02
   },
   {
-    "name": "其他化学原料",
-    "code": "BK1420",
-    "change_pct": -0.16,
-    "amount": "98.13亿",
-    "up_count": 5,
-    "down_count": 11,
-    "lead_stock": 7.97
-  },
-  {
-    "name": "涂料油墨",
-    "code": "BK1430",
-    "change_pct": -0.18,
-    "amount": "32.39亿",
-    "up_count": 7,
-    "down_count": 10,
-    "lead_stock": 6.35
-  },
-  {
-    "name": "锂电池",
-    "code": "BK1303",
-    "change_pct": -0.18,
-    "amount": "356.22亿",
-    "up_count": 10,
-    "down_count": 21,
-    "lead_stock": 15.49
-  },
-  {
-    "name": "专业工程",
-    "code": "BK1248",
-    "change_pct": -0.28,
-    "amount": "111.16亿",
-    "up_count": 11,
-    "down_count": 29,
-    "lead_stock": 10.01
-  },
-  {
-    "name": "汽车综合服务",
-    "code": "BK1524",
-    "change_pct": -0.29,
-    "amount": "7.75亿",
-    "up_count": 2,
-    "down_count": 1,
-    "lead_stock": 3.27
-  },
-  {
-    "name": "聚氨酯",
-    "code": "BK1426",
-    "change_pct": -0.3,
-    "amount": "38.49亿",
-    "up_count": 4,
-    "down_count": 5,
-    "lead_stock": 3.86
-  },
-  {
-    "name": "航运港口",
-    "code": "BK0450",
-    "change_pct": -0.38,
-    "amount": "99.67亿",
-    "up_count": 9,
-    "down_count": 26,
-    "lead_stock": 9.99
-  },
-  {
-    "name": "橡胶",
-    "code": "BK1018",
-    "change_pct": -0.42,
-    "amount": "50.62亿",
-    "up_count": 7,
-    "down_count": 16,
+    "name": "硅料硅片",
+    "code": "BK1319",
+    "change_pct": 4.28,
+    "amount": "68.47亿",
+    "up_count": 3,
+    "down_count": 2,
     "lead_stock": 10.0
-  },
-  {
-    "name": "化学制药",
-    "code": "BK0465",
-    "change_pct": -0.43,
-    "amount": "347.45亿",
-    "up_count": 59,
-    "down_count": 97,
-    "lead_stock": 9.98
-  },
-  {
-    "name": "调味发酵品Ⅲ",
-    "code": "BK1576",
-    "change_pct": -0.45,
-    "amount": "47.97亿",
-    "up_count": 5,
-    "down_count": 10,
-    "lead_stock": 9.99
-  },
-  {
-    "name": "调味发酵品Ⅱ",
-    "code": "BK1278",
-    "change_pct": -0.45,
-    "amount": "47.97亿",
-    "up_count": 5,
-    "down_count": 10,
-    "lead_stock": 9.99
-  },
-  {
-    "name": "电池",
-    "code": "BK1033",
-    "change_pct": -0.45,
-    "amount": "796.20亿",
-    "up_count": 37,
-    "down_count": 66,
-    "lead_stock": 10.0
-  },
-  {
-    "name": "锂电专用设备",
-    "code": "BK1304",
-    "change_pct": -0.49,
-    "amount": "47.11亿",
-    "up_count": 7,
-    "down_count": 12,
-    "lead_stock": 4.46
-  },
-  {
-    "name": "铁矿石",
-    "code": "BK1371",
-    "change_pct": -0.5,
-    "amount": "11.14亿",
-    "up_count": 1,
-    "down_count": 4,
-    "lead_stock": 6.46
-  },
-  {
-    "name": "通信线缆及配套",
-    "code": "BK1592",
-    "change_pct": -0.5,
-    "amount": "511.77亿",
-    "up_count": 2,
-    "down_count": 11,
-    "lead_stock": 10.01
   },
   {
     "name": "航天装备Ⅲ",
     "code": "BK1385",
-    "change_pct": -0.5,
-    "amount": "47.98亿",
-    "up_count": 4,
-    "down_count": 5,
-    "lead_stock": 1.55
+    "change_pct": 4.25,
+    "amount": "178.73亿",
+    "up_count": 7,
+    "down_count": 2,
+    "lead_stock": 10.0
   },
   {
     "name": "航天装备Ⅱ",
     "code": "BK1232",
-    "change_pct": -0.5,
-    "amount": "47.98亿",
-    "up_count": 4,
-    "down_count": 5,
-    "lead_stock": 1.55
-  },
-  {
-    "name": "电池化学品",
-    "code": "BK1302",
-    "change_pct": -0.51,
-    "amount": "343.72亿",
-    "up_count": 19,
-    "down_count": 24,
-    "lead_stock": 9.1
-  },
-  {
-    "name": "鞋帽及其他",
-    "code": "BK1354",
-    "change_pct": -0.52,
-    "amount": "11.86亿",
-    "up_count": 3,
-    "down_count": 8,
-    "lead_stock": 10.04
-  },
-  {
-    "name": "空调",
-    "code": "BK1450",
-    "change_pct": -0.53,
-    "amount": "27.95亿",
-    "up_count": 1,
+    "change_pct": 4.25,
+    "amount": "178.73亿",
+    "up_count": 7,
     "down_count": 2,
-    "lead_stock": 0.48
+    "lead_stock": 10.0
   },
   {
-    "name": "装修装饰Ⅲ",
-    "code": "BK1478",
-    "change_pct": -0.55,
-    "amount": "23.56亿",
-    "up_count": 5,
-    "down_count": 15,
-    "lead_stock": 20.08
+    "name": "玻纤制造",
+    "code": "BK1462",
+    "change_pct": 4.09,
+    "amount": "442.12亿",
+    "up_count": 7,
+    "down_count": 1,
+    "lead_stock": 9.17
   },
   {
-    "name": "装修装饰Ⅱ",
-    "code": "BK0725",
-    "change_pct": -0.55,
-    "amount": "23.56亿",
-    "up_count": 5,
-    "down_count": 15,
-    "lead_stock": 20.08
-  },
-  {
-    "name": "生物制品",
-    "code": "BK1044",
-    "change_pct": -0.6,
-    "amount": "99.51亿",
-    "up_count": 19,
-    "down_count": 38,
-    "lead_stock": 7.2
-  },
-  {
-    "name": "国防军工",
-    "code": "BK1204",
-    "change_pct": -0.6,
-    "amount": "491.71亿",
-    "up_count": 38,
-    "down_count": 104,
+    "name": "半导体材料",
+    "code": "BK1325",
+    "change_pct": 3.76,
+    "amount": "954.01亿",
+    "up_count": 23,
+    "down_count": 8,
     "lead_stock": 10.01
   },
   {
-    "name": "消费电子零部件及组装",
-    "code": "BK1338",
-    "change_pct": -0.62,
-    "amount": "880.82亿",
-    "up_count": 29,
-    "down_count": 57,
-    "lead_stock": 9.98
+    "name": "半导体设备",
+    "code": "BK1326",
+    "change_pct": 2.57,
+    "amount": "743.69亿",
+    "up_count": 16,
+    "down_count": 6,
+    "lead_stock": 20.0
   },
   {
-    "name": "工业金属",
-    "code": "BK1287",
-    "change_pct": -0.68,
-    "amount": "516.00亿",
-    "up_count": 21,
-    "down_count": 37,
-    "lead_stock": 10.0
+    "name": "风电整机",
+    "code": "BK1314",
+    "change_pct": 2.38,
+    "amount": "91.29亿",
+    "up_count": 3,
+    "down_count": 2,
+    "lead_stock": 8.56
   },
   {
-    "name": "家纺",
-    "code": "BK1353",
-    "change_pct": -0.69,
-    "amount": "3.80亿",
-    "up_count": 2,
-    "down_count": 5,
-    "lead_stock": 4.09
-  },
-  {
-    "name": "汽车电子电气系统",
-    "code": "BK1529",
-    "change_pct": -0.71,
-    "amount": "79.82亿",
-    "up_count": 10,
-    "down_count": 32,
-    "lead_stock": 20.01
-  },
-  {
-    "name": "其他运输设备",
-    "code": "BK1522",
-    "change_pct": -0.74,
-    "amount": "9.02亿",
-    "up_count": 2,
-    "down_count": 8,
-    "lead_stock": 11.11
-  },
-  {
-    "name": "快递",
-    "code": "BK1489",
-    "change_pct": -0.74,
-    "amount": "9.52亿",
-    "up_count": 1,
+    "name": "生猪养殖",
+    "code": "BK1512",
+    "change_pct": 1.8,
+    "amount": "70.92亿",
+    "up_count": 8,
     "down_count": 3,
-    "lead_stock": 0.22
-  },
-  {
-    "name": "蓄电池及其他电池",
-    "code": "BK1306",
-    "change_pct": -0.74,
-    "amount": "48.74亿",
-    "up_count": 1,
-    "down_count": 8,
-    "lead_stock": 10.0
-  },
-  {
-    "name": "其他小金属",
-    "code": "BK1624",
-    "change_pct": -0.76,
-    "amount": "288.74亿",
-    "up_count": 4,
-    "down_count": 11,
-    "lead_stock": 9.99
-  },
-  {
-    "name": "农药",
-    "code": "BK1436",
-    "change_pct": -0.77,
-    "amount": "37.34亿",
-    "up_count": 13,
-    "down_count": 21,
-    "lead_stock": 9.99
-  },
-  {
-    "name": "消费电子",
-    "code": "BK1037",
-    "change_pct": -0.77,
-    "amount": "900.52亿",
-    "up_count": 31,
-    "down_count": 66,
-    "lead_stock": 9.98
-  },
-  {
-    "name": "其他电源设备Ⅲ",
-    "code": "BK1322",
-    "change_pct": -0.79,
-    "amount": "138.47亿",
-    "up_count": 5,
-    "down_count": 22,
-    "lead_stock": 19.99
-  },
-  {
-    "name": "其他橡胶制品",
-    "code": "BK1441",
-    "change_pct": -0.82,
-    "amount": "9.75亿",
-    "up_count": 4,
-    "down_count": 11,
-    "lead_stock": 9.62
-  },
-  {
-    "name": "摩托车及其他",
-    "code": "BK1263",
-    "change_pct": -0.83,
-    "amount": "21.10亿",
-    "up_count": 6,
-    "down_count": 13,
-    "lead_stock": 11.11
-  },
-  {
-    "name": "油气开采Ⅲ",
-    "code": "BK1574",
-    "change_pct": -0.84,
-    "amount": "17.47亿",
-    "up_count": 1,
-    "down_count": 3,
-    "lead_stock": 4.26
-  },
-  {
-    "name": "油气开采Ⅱ",
-    "code": "BK1276",
-    "change_pct": -0.84,
-    "amount": "17.47亿",
-    "up_count": 1,
-    "down_count": 3,
-    "lead_stock": 4.26
-  },
-  {
-    "name": "基础化工",
-    "code": "BK1206",
-    "change_pct": -0.85,
-    "amount": "1400.26亿",
-    "up_count": 146,
-    "down_count": 298,
     "lead_stock": 10.02
   },
   {
-    "name": "车身附件及饰件",
-    "code": "BK1525",
-    "change_pct": -0.87,
-    "amount": "55.47亿",
+    "name": "玻璃玻纤",
+    "code": "BK0546",
+    "change_pct": 1.62,
+    "amount": "493.45亿",
+    "up_count": 11,
+    "down_count": 6,
+    "lead_stock": 9.17
+  },
+  {
+    "name": "培训教育",
+    "code": "BK1557",
+    "change_pct": 1.59,
+    "amount": "11.65亿",
+    "up_count": 4,
+    "down_count": 6,
+    "lead_stock": 17.39
+  },
+  {
+    "name": "光伏加工设备",
+    "code": "BK1317",
+    "change_pct": 0.98,
+    "amount": "162.03亿",
+    "up_count": 5,
+    "down_count": 6,
+    "lead_stock": 8.54
+  },
+  {
+    "name": "燃料电池",
+    "code": "BK1305",
+    "change_pct": 0.84,
+    "amount": "1.01亿",
+    "up_count": 1,
+    "down_count": 0,
+    "lead_stock": 0.84
+  },
+  {
+    "name": "教育",
+    "code": "BK0740",
+    "change_pct": 0.77,
+    "amount": "15.29亿",
+    "up_count": 5,
+    "down_count": 9,
+    "lead_stock": 17.39
+  },
+  {
+    "name": "辅料",
+    "code": "BK1348",
+    "change_pct": 0.76,
+    "amount": "2.97亿",
+    "up_count": 1,
+    "down_count": 3,
+    "lead_stock": 10.0
+  },
+  {
+    "name": "LED",
+    "code": "BK1333",
+    "change_pct": 0.74,
+    "amount": "339.38亿",
+    "up_count": 13,
+    "down_count": 16,
+    "lead_stock": 19.98
+  },
+  {
+    "name": "医美服务",
+    "code": "BK1499",
+    "change_pct": 0.65,
+    "amount": "2662.11万",
+    "up_count": 1,
+    "down_count": 0,
+    "lead_stock": 0.65
+  },
+  {
+    "name": "水产饲料",
+    "code": "BK1509",
+    "change_pct": 0.53,
+    "amount": "7.53亿",
+    "up_count": 2,
+    "down_count": 2,
+    "lead_stock": 3.27
+  },
+  {
+    "name": "养殖业",
+    "code": "BK1259",
+    "change_pct": 0.52,
+    "amount": "81.07亿",
+    "up_count": 11,
+    "down_count": 11,
+    "lead_stock": 10.02
+  },
+  {
+    "name": "仓储物流",
+    "code": "BK1486",
+    "change_pct": 0.52,
+    "amount": "11.05亿",
+    "up_count": 2,
+    "down_count": 4,
+    "lead_stock": 10.04
+  },
+  {
+    "name": "风力发电",
+    "code": "BK1374",
+    "change_pct": 0.4,
+    "amount": "41.62亿",
+    "up_count": 4,
+    "down_count": 11,
+    "lead_stock": 10.02
+  },
+  {
+    "name": "其他专业工程",
+    "code": "BK1477",
+    "change_pct": 0.38,
+    "amount": "127.99亿",
     "up_count": 8,
-    "down_count": 33,
-    "lead_stock": 9.99
+    "down_count": 11,
+    "lead_stock": 10.0
   },
   {
-    "name": "医药生物",
-    "code": "BK1216",
-    "change_pct": -0.88,
-    "amount": "939.27亿",
-    "up_count": 149,
-    "down_count": 353,
-    "lead_stock": 9.98
+    "name": "电子化学品Ⅲ",
+    "code": "BK1332",
+    "change_pct": 0.36,
+    "amount": "922.97亿",
+    "up_count": 20,
+    "down_count": 16,
+    "lead_stock": 9.42
   },
   {
-    "name": "工控设备",
-    "code": "BK1407",
-    "change_pct": -0.88,
-    "amount": "110.67亿",
-    "up_count": 9,
-    "down_count": 23,
-    "lead_stock": 6.22
+    "name": "电子化学品Ⅱ",
+    "code": "BK1039",
+    "change_pct": 0.36,
+    "amount": "922.97亿",
+    "up_count": 20,
+    "down_count": 16,
+    "lead_stock": 9.42
   },
   {
     "name": "物业管理",
     "code": "BK1343",
-    "change_pct": -0.9,
-    "amount": "2.84亿",
+    "change_pct": 0.35,
+    "amount": "5.75亿",
+    "up_count": 4,
+    "down_count": 5,
+    "lead_stock": 3.17
+  },
+  {
+    "name": "光学光电子",
+    "code": "BK1038",
+    "change_pct": 0.35,
+    "amount": "1623.77亿",
+    "up_count": 43,
+    "down_count": 54,
+    "lead_stock": 10.0
+  },
+  {
+    "name": "涂料",
+    "code": "BK1469",
+    "change_pct": 0.33,
+    "amount": "2.13亿",
+    "up_count": 1,
+    "down_count": 1,
+    "lead_stock": 3.39
+  },
+  {
+    "name": "光学元件",
+    "code": "BK1334",
+    "change_pct": 0.21,
+    "amount": "311.33亿",
+    "up_count": 12,
+    "down_count": 13,
+    "lead_stock": 10.01
+  },
+  {
+    "name": "摩托车",
+    "code": "BK1521",
+    "change_pct": 0.18,
+    "amount": "20.30亿",
+    "up_count": 4,
+    "down_count": 5,
+    "lead_stock": 10.0
+  },
+  {
+    "name": "面板",
+    "code": "BK1335",
+    "change_pct": 0.15,
+    "amount": "973.05亿",
+    "up_count": 18,
+    "down_count": 25,
+    "lead_stock": 10.0
+  },
+  {
+    "name": "粮食种植",
+    "code": "BK1515",
+    "change_pct": 0.14,
+    "amount": "6.89亿",
+    "up_count": 1,
+    "down_count": 1,
+    "lead_stock": 0.94
+  },
+  {
+    "name": "熟食",
+    "code": "BK1584",
+    "change_pct": 0.14,
+    "amount": "2.66亿",
+    "up_count": 1,
+    "down_count": 2,
+    "lead_stock": 3.13
+  },
+  {
+    "name": "冰洗",
+    "code": "BK1449",
+    "change_pct": -0.05,
+    "amount": "14.95亿",
+    "up_count": 2,
+    "down_count": 7,
+    "lead_stock": 7.0
+  },
+  {
+    "name": "白色家电",
+    "code": "BK1239",
+    "change_pct": -0.12,
+    "amount": "69.62亿",
+    "up_count": 3,
+    "down_count": 9,
+    "lead_stock": 7.0
+  },
+  {
+    "name": "聚氨酯",
+    "code": "BK1426",
+    "change_pct": -0.16,
+    "amount": "44.68亿",
     "up_count": 3,
     "down_count": 6,
-    "lead_stock": 4.84
+    "lead_stock": 8.8
+  },
+  {
+    "name": "跨境电商",
+    "code": "BK1547",
+    "change_pct": -0.21,
+    "amount": "15.78亿",
+    "up_count": 1,
+    "down_count": 6,
+    "lead_stock": 12.94
+  },
+  {
+    "name": "卫浴制品",
+    "code": "BK1541",
+    "change_pct": -0.34,
+    "amount": "3.28亿",
+    "up_count": 2,
+    "down_count": 5,
+    "lead_stock": 5.93
+  },
+  {
+    "name": "教育运营及其他",
+    "code": "BK1556",
+    "change_pct": -0.34,
+    "amount": "2.35亿",
+    "up_count": 1,
+    "down_count": 1,
+    "lead_stock": 1.95
+  },
+  {
+    "name": "空调",
+    "code": "BK1450",
+    "change_pct": -0.36,
+    "amount": "54.67亿",
+    "up_count": 1,
+    "down_count": 2,
+    "lead_stock": 2.68
+  },
+  {
+    "name": "摩托车及其他",
+    "code": "BK1263",
+    "change_pct": -0.39,
+    "amount": "37.76亿",
+    "up_count": 5,
+    "down_count": 14,
+    "lead_stock": 10.0
+  },
+  {
+    "name": "核力发电",
+    "code": "BK1376",
+    "change_pct": -0.47,
+    "amount": "14.36亿",
+    "up_count": 0,
+    "down_count": 3,
+    "lead_stock": -0.36
+  },
+  {
+    "name": "国有大型银行Ⅲ",
+    "code": "BK1611",
+    "change_pct": -0.52,
+    "amount": "98.02亿",
+    "up_count": 1,
+    "down_count": 5,
+    "lead_stock": 0.41
+  },
+  {
+    "name": "商业地产",
+    "code": "BK1345",
+    "change_pct": -0.53,
+    "amount": "15.46亿",
+    "up_count": 3,
+    "down_count": 9,
+    "lead_stock": 5.04
+  },
+  {
+    "name": "肉鸡养殖",
+    "code": "BK1511",
+    "change_pct": -0.55,
+    "amount": "9.06亿",
+    "up_count": 2,
+    "down_count": 6,
+    "lead_stock": 3.44
+  },
+  {
+    "name": "农业综合Ⅲ",
+    "code": "BK1506",
+    "change_pct": -0.57,
+    "amount": "1.67亿",
+    "up_count": 1,
+    "down_count": 2,
+    "lead_stock": 3.1
+  },
+  {
+    "name": "农业综合Ⅱ",
+    "code": "BK1257",
+    "change_pct": -0.57,
+    "amount": "1.67亿",
+    "up_count": 1,
+    "down_count": 2,
+    "lead_stock": 3.1
+  },
+  {
+    "name": "玻璃制造",
+    "code": "BK1461",
+    "change_pct": -0.57,
+    "amount": "51.33亿",
+    "up_count": 4,
+    "down_count": 5,
+    "lead_stock": 6.95
+  },
+  {
+    "name": "果蔬加工",
+    "code": "BK1503",
+    "change_pct": -0.59,
+    "amount": "7.40亿",
+    "up_count": 1,
+    "down_count": 4,
+    "lead_stock": 10.02
+  },
+  {
+    "name": "风电设备",
+    "code": "BK1032",
+    "change_pct": -0.61,
+    "amount": "179.75亿",
+    "up_count": 9,
+    "down_count": 22,
+    "lead_stock": 8.56
+  },
+  {
+    "name": "光伏发电",
+    "code": "BK1375",
+    "change_pct": -0.62,
+    "amount": "74.74亿",
+    "up_count": 5,
+    "down_count": 8,
+    "lead_stock": 7.45
+  },
+  {
+    "name": "产业地产",
+    "code": "BK1344",
+    "change_pct": -0.66,
+    "amount": "27.62亿",
+    "up_count": 3,
+    "down_count": 9,
+    "lead_stock": 3.82
+  },
+  {
+    "name": "光伏设备",
+    "code": "BK1031",
+    "change_pct": -0.7,
+    "amount": "634.06亿",
+    "up_count": 21,
+    "down_count": 46,
+    "lead_stock": 10.0
+  },
+  {
+    "name": "畜禽饲料",
+    "code": "BK1508",
+    "change_pct": -0.78,
+    "amount": "8.22亿",
+    "up_count": 1,
+    "down_count": 7,
+    "lead_stock": 1.25
+  },
+  {
+    "name": "其他酒类",
+    "code": "BK1578",
+    "change_pct": -0.82,
+    "amount": "5.79亿",
+    "up_count": 1,
+    "down_count": 9,
+    "lead_stock": 10.0
+  },
+  {
+    "name": "饲料",
+    "code": "BK1258",
+    "change_pct": -0.82,
+    "amount": "19.17亿",
+    "up_count": 3,
+    "down_count": 13,
+    "lead_stock": 3.27
+  },
+  {
+    "name": "电信运营商",
+    "code": "BK1587",
+    "change_pct": -0.83,
+    "amount": "21.77亿",
+    "up_count": 0,
+    "down_count": 3,
+    "lead_stock": -0.74
+  },
+  {
+    "name": "其他能源发电",
+    "code": "BK1378",
+    "change_pct": -0.85,
+    "amount": "1.19亿",
+    "up_count": 0,
+    "down_count": 2,
+    "lead_stock": -0.67
+  },
+  {
+    "name": "半导体",
+    "code": "BK1036",
+    "change_pct": -0.88,
+    "amount": "6103.29亿",
+    "up_count": 60,
+    "down_count": 116,
+    "lead_stock": 10.01
+  },
+  {
+    "name": "炼油化工",
+    "code": "BK1569",
+    "change_pct": -0.88,
+    "amount": "102.66亿",
+    "up_count": 3,
+    "down_count": 7,
+    "lead_stock": 7.34
+  },
+  {
+    "name": "其他运输设备",
+    "code": "BK1522",
+    "change_pct": -0.89,
+    "amount": "17.46亿",
+    "up_count": 1,
+    "down_count": 9,
+    "lead_stock": 5.48
+  },
+  {
+    "name": "光伏主材",
+    "code": "BK1318",
+    "change_pct": -0.95,
+    "amount": "39.76亿",
+    "up_count": 1,
+    "down_count": 1,
+    "lead_stock": 0.48
+  },
+  {
+    "name": "成品家居",
+    "code": "BK1537",
+    "change_pct": -0.95,
+    "amount": "20.79亿",
+    "up_count": 4,
+    "down_count": 13,
+    "lead_stock": 7.4
+  },
+  {
+    "name": "管材",
+    "code": "BK1466",
+    "change_pct": -0.97,
+    "amount": "6.18亿",
+    "up_count": 2,
+    "down_count": 5,
+    "lead_stock": 3.17
+  },
+  {
+    "name": "集成电路封测",
+    "code": "BK1328",
+    "change_pct": -0.98,
+    "amount": "840.73亿",
+    "up_count": 5,
+    "down_count": 8,
+    "lead_stock": 4.62
+  },
+  {
+    "name": "房地产服务",
+    "code": "BK1045",
+    "change_pct": -1.03,
+    "amount": "11.17亿",
+    "up_count": 4,
+    "down_count": 10,
+    "lead_stock": 3.17
+  },
+  {
+    "name": "水力发电",
+    "code": "BK1380",
+    "change_pct": -1.03,
+    "amount": "56.05亿",
+    "up_count": 4,
+    "down_count": 6,
+    "lead_stock": 1.64
+  },
+  {
+    "name": "装修装饰Ⅲ",
+    "code": "BK1478",
+    "change_pct": -1.06,
+    "amount": "38.85亿",
+    "up_count": 7,
+    "down_count": 14,
+    "lead_stock": 6.67
+  },
+  {
+    "name": "装修装饰Ⅱ",
+    "code": "BK0725",
+    "change_pct": -1.06,
+    "amount": "38.85亿",
+    "up_count": 7,
+    "down_count": 14,
+    "lead_stock": 6.67
+  },
+  {
+    "name": "专业工程",
+    "code": "BK1248",
+    "change_pct": -1.08,
+    "amount": "172.61亿",
+    "up_count": 11,
+    "down_count": 28,
+    "lead_stock": 10.0
+  },
+  {
+    "name": "城商行Ⅲ",
+    "code": "BK1609",
+    "change_pct": -1.08,
+    "amount": "62.63亿",
+    "up_count": 2,
+    "down_count": 14,
+    "lead_stock": 1.1
+  },
+  {
+    "name": "农商行Ⅲ",
+    "code": "BK1612",
+    "change_pct": -1.08,
+    "amount": "12.02亿",
+    "up_count": 1,
+    "down_count": 8,
+    "lead_stock": 0.17
+  },
+  {
+    "name": "银行",
+    "code": "BK1283",
+    "change_pct": -1.11,
+    "amount": "275.32亿",
+    "up_count": 4,
+    "down_count": 36,
+    "lead_stock": 1.1
+  },
+  {
+    "name": "银行Ⅱ",
+    "code": "BK0475",
+    "change_pct": -1.11,
+    "amount": "275.32亿",
+    "up_count": 4,
+    "down_count": 36,
+    "lead_stock": 1.1
+  },
+  {
+    "name": "其他饰品",
+    "code": "BK1356",
+    "change_pct": -1.18,
+    "amount": "7939.33万",
+    "up_count": 1,
+    "down_count": 1,
+    "lead_stock": 2.33
+  },
+  {
+    "name": "建筑材料",
+    "code": "BK1208",
+    "change_pct": -1.19,
+    "amount": "590.37亿",
+    "up_count": 16,
+    "down_count": 60,
+    "lead_stock": 9.17
+  },
+  {
+    "name": "风电零部件",
+    "code": "BK1313",
+    "change_pct": -1.19,
+    "amount": "88.46亿",
+    "up_count": 6,
+    "down_count": 20,
+    "lead_stock": 7.42
+  },
+  {
+    "name": "粮油加工",
+    "code": "BK1504",
+    "change_pct": -1.2,
+    "amount": "4.01亿",
+    "up_count": 0,
+    "down_count": 8,
+    "lead_stock": 0.0
+  },
+  {
+    "name": "其他小金属",
+    "code": "BK1624",
+    "change_pct": -1.23,
+    "amount": "337.89亿",
+    "up_count": 4,
+    "down_count": 11,
+    "lead_stock": 6.02
+  },
+  {
+    "name": "国防军工",
+    "code": "BK1204",
+    "change_pct": -1.23,
+    "amount": "1055.41亿",
+    "up_count": 35,
+    "down_count": 106,
+    "lead_stock": 10.0
+  },
+  {
+    "name": "预加工食品",
+    "code": "BK1581",
+    "change_pct": -1.24,
+    "amount": "9.90亿",
+    "up_count": 1,
+    "down_count": 10,
+    "lead_stock": 10.0
+  },
+  {
+    "name": "民爆制品",
+    "code": "BK1427",
+    "change_pct": -1.25,
+    "amount": "35.40亿",
+    "up_count": 2,
+    "down_count": 10,
+    "lead_stock": 9.98
+  },
+  {
+    "name": "互联网电商",
+    "code": "BK1268",
+    "change_pct": -1.27,
+    "amount": "31.19亿",
+    "up_count": 4,
+    "down_count": 13,
+    "lead_stock": 9.98
+  },
+  {
+    "name": "钼",
+    "code": "BK1623",
+    "change_pct": -1.28,
+    "amount": "45.55亿",
+    "up_count": 1,
+    "down_count": 1,
+    "lead_stock": 0.82
+  },
+  {
+    "name": "定制家居",
+    "code": "BK1539",
+    "change_pct": -1.3,
+    "amount": "20.86亿",
+    "up_count": 3,
+    "down_count": 13,
+    "lead_stock": 14.21
+  },
+  {
+    "name": "光伏辅材",
+    "code": "BK1316",
+    "change_pct": -1.3,
+    "amount": "60.90亿",
+    "up_count": 6,
+    "down_count": 11,
+    "lead_stock": 3.7
+  },
+  {
+    "name": "工程机械整机",
+    "code": "BK1393",
+    "change_pct": -1.3,
+    "amount": "62.35亿",
+    "up_count": 3,
+    "down_count": 19,
+    "lead_stock": 9.99
+  },
+  {
+    "name": "其他养殖",
+    "code": "BK1510",
+    "change_pct": -1.31,
+    "amount": "1.08亿",
+    "up_count": 1,
+    "down_count": 2,
+    "lead_stock": 1.16
+  },
+  {
+    "name": "教育出版",
+    "code": "BK1290",
+    "change_pct": -1.31,
+    "amount": "4.91亿",
+    "up_count": 1,
+    "down_count": 9,
+    "lead_stock": 0.52
+  },
+  {
+    "name": "钢结构",
+    "code": "BK1474",
+    "change_pct": -1.32,
+    "amount": "8.97亿",
+    "up_count": 2,
+    "down_count": 8,
+    "lead_stock": 3.26
+  },
+  {
+    "name": "综合电商",
+    "code": "BK1548",
+    "change_pct": -1.33,
+    "amount": "2.54亿",
+    "up_count": 1,
+    "down_count": 1,
+    "lead_stock": 0.84
+  },
+  {
+    "name": "被动元件",
+    "code": "BK1339",
+    "change_pct": -1.34,
+    "amount": "577.59亿",
+    "up_count": 7,
+    "down_count": 12,
+    "lead_stock": 4.19
+  },
+  {
+    "name": "种子",
+    "code": "BK1518",
+    "change_pct": -1.34,
+    "amount": "7.02亿",
+    "up_count": 1,
+    "down_count": 9,
+    "lead_stock": 1.08
+  },
+  {
+    "name": "农林牧渔",
+    "code": "BK0433",
+    "change_pct": -1.34,
+    "amount": "168.28亿",
+    "up_count": 20,
+    "down_count": 89,
+    "lead_stock": 10.02
+  },
+  {
+    "name": "医疗研发外包",
+    "code": "BK1600",
+    "change_pct": -1.35,
+    "amount": "204.31亿",
+    "up_count": 9,
+    "down_count": 20,
+    "lead_stock": 12.5
+  },
+  {
+    "name": "高速公路",
+    "code": "BK1483",
+    "change_pct": -1.35,
+    "amount": "10.44亿",
+    "up_count": 3,
+    "down_count": 18,
+    "lead_stock": 3.17
+  },
+  {
+    "name": "光伏电池组件",
+    "code": "BK1315",
+    "change_pct": -1.36,
+    "amount": "137.96亿",
+    "up_count": 6,
+    "down_count": 17,
+    "lead_stock": 5.18
+  },
+  {
+    "name": "工程机械",
+    "code": "BK0739",
+    "change_pct": -1.37,
+    "amount": "83.57亿",
+    "up_count": 5,
+    "down_count": 30,
+    "lead_stock": 9.99
+  },
+  {
+    "name": "房地产",
+    "code": "BK1202",
+    "change_pct": -1.38,
+    "amount": "212.33亿",
+    "up_count": 21,
+    "down_count": 82,
+    "lead_stock": 9.97
+  },
+  {
+    "name": "林业Ⅲ",
+    "code": "BK1502",
+    "change_pct": -1.38,
+    "amount": "7.20亿",
+    "up_count": 1,
+    "down_count": 3,
+    "lead_stock": 0.24
   }
 ]
