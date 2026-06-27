@@ -132,7 +132,23 @@ def fetch_indices():
 
 
 def _calc_total_amount(indices):
-    """从指数数据计算沪深成交额（指数数据来自腾讯，即使东财挂了也有）"""
+    """从东方财富指数数据获取沪深成交额"""
+    # 优先从东方财富获取（精确）
+    data = _fetch_json("https://push2.eastmoney.com/api/qt/ulist.np/get", {
+        "fields": "f2,f6,f12,f14",
+        "secids": "1.000001,0.399001",
+        "ut": "bd1d9ddb04089700cf9c27f6f7426281",
+    })
+    if data and data.get("rc") == 0 and data.get("data", {}).get("diff"):
+        total = 0
+        for item in data["data"]["diff"]:
+            amount = item.get("f6")
+            if amount and isinstance(amount, (int, float)) and amount > 0:
+                total += amount
+        if total > 0:
+            return f"{total/1e8:.0f}亿"
+
+    # 回退：从 index parse 数据取
     sh_amount, sz_amount = 0, 0
     for idx in (indices or []):
         name = idx.get("name", "")
@@ -246,7 +262,7 @@ def fetch_sentiment(indices):
 
     # ===== 尝试获取实时数据 =====
     limit_up, limit_down = None, None
-    up_count_extrapolated, down_count_extrapolated = None, None
+    up_count, down_count = None, None
     ratio = "—"
 
     # 1) 按涨跌幅排序精确统计涨停/跌停
@@ -254,35 +270,33 @@ def fetch_sentiment(indices):
     limit_down, down_ok = _count_limits_sorted("asc", 9.8)
     got_limits = up_ok and down_ok
 
-    # 2) 涨跌家数
+    # 2) 涨跌家数 — 全市场翻页精确统计
+    # 用东方财富全A股列表，分页遍历每只股票的f3（涨跌幅），精确计数
     params = {
         "pn": 1, "pz": 100, "po": 0, "np": 1,
         "ut": "bd1d9ddb04089700cf9c27f6f7426281",
-        "fltt": 2, "invt": 2, "fid": "f12",
+        "fltt": 2, "invt": 2, "fid": "f3",
         "fs": "m:0+t:6,m:0+t:80,m:1+t:2,m:1+t:23,m:0+t:81+s:2048",
-        "fields": "f2,f3,f4,f5,f6,f12,f14",
+        "fields": "f3",
     }
-    data = _em_get(params)
-    got_updown = bool(data and data.get("data", {}).get("diff"))
+    all_items, total_stocks = _fetch_all_market_pages(params)
+    got_updown = bool(all_items and len(all_items) > 0)
 
     if got_limits and got_updown:
-        # ✅ 双丰收：涨停/跌停 + 涨跌家数都有实时数据
-        items = data["data"]["diff"]
-        total_stocks = data["data"].get("total", 5300)
-        up = sum(1 for r in items if _sf(r.get("f3")) > 0)
-        dn = sum(1 for r in items if _sf(r.get("f3")) < 0)
-        sampled = len(items)
-        up_ratio = up / sampled if sampled > 0 else 0.5
+        # ✅ 全市场精确统计
+        up = sum(1 for r in all_items if _sf(r.get("f3")) > 0)
+        dn = sum(1 for r in all_items if _sf(r.get("f3")) < 0)
+        flat = len(all_items) - up - dn
         ratio = round(up / dn, 2) if dn > 0 else "—"
-        up_count_extrapolated = round(total_stocks * up_ratio)
-        down_count_extrapolated = total_stocks - up_count_extrapolated
-        print(f"  Live data OK: 涨停={limit_up}, 跌停={limit_down}, 涨={up_count_extrapolated}, 跌={down_count_extrapolated}")
+        up_count = up
+        down_count = dn
+        print(f"  Full scan OK: 涨停={limit_up}, 跌停={limit_down}, 涨={up}, 跌={dn}, 平={flat}")
     elif got_limits:
         # 只有涨停/跌停，涨跌家数用上日数据
         print(f"  Limited live data: 涨停={limit_up}, 跌停={limit_down}, 涨跌家数用上日")
-        up_count_extrapolated = last_real["up_count"] if last_real else round(total_stocks * 0.45)
-        down_count_extrapolated = last_real["down_count"] if last_real else round(total_stocks * 0.45)
-        ratio = round(up_count_extrapolated / down_count_extrapolated, 2) if down_count_extrapolated > 0 else "—"
+        up_count = last_real["up_count"] if last_real else round(total_stocks * 0.45)
+        down_count = last_real["down_count"] if last_real else round(total_stocks * 0.45)
+        ratio = round(up_count / down_count, 2) if down_count > 0 else "—"
     elif last_real:
         # ❌ 全挂，用上日真实数据
         total_amount_str = _calc_total_amount(indices)
@@ -311,11 +325,11 @@ def fetch_sentiment(indices):
     total_amount_str = _calc_total_amount(indices)
 
     result = {
-        "sentiment_temperature": round((up_count_extrapolated / total_stocks) * 100) if total_stocks > 0 else 50,
+        "sentiment_temperature": round((up_count / total_stocks) * 100) if total_stocks > 0 else 50,
         "total_stocks": total_stocks,
-        "up_count": up_count_extrapolated,
-        "down_count": down_count_extrapolated,
-        "flat_count": max(0, total_stocks - up_count_extrapolated - down_count_extrapolated),
+        "up_count": up_count,
+        "down_count": down_count,
+        "flat_count": max(0, total_stocks - up_count - down_count),
         "limit_up": limit_up,
         "limit_down": limit_down,
         "advance_decline_ratio": ratio,
