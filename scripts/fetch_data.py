@@ -166,44 +166,47 @@ def _calc_total_amount(indices):
     return "—"
 
 
-def _count_limits_sorted(sort_dir="desc", threshold=9.8, pz=100, max_pages=2):
-    """按涨跌幅排序取前N页，精确统计涨停/跌停家数
-    sort_dir: 'desc' 涨停(最高涨幅在前), 'asc' 跌停(最大跌幅在前)
-    返回 (精确计数, 是否完整)
+def _get_limit_threshold(code, name):
+    """根据股票代码和名称返回涨跌幅限制（百分比）
+    返回 None 表示无限制（新股首日等）
     """
-    params = {
-        "pn": 1, "pz": pz, "po": 0, "np": 1,
-        "ut": "bd1d9ddb04089700cf9c27f6f7426281",
-        "fltt": 2, "invt": 2, "fid": "f3",
-        "fs": "m:0+t:6,m:0+t:80,m:1+t:2,m:1+t:23,m:0+t:81+s:2048",
-        "fields": "f2,f3,f12,f14",
-    }
-    if sort_dir == "desc":
-        params["po"] = 1  # 降序
-        cond = lambda v: v >= threshold
-    else:
-        params["po"] = 0  # 升序（默认）
-        cond = lambda v: v <= -threshold
+    # 新股首日(N)或次日至第五日(C) 无涨跌幅限制
+    if name.startswith(('N', 'C')) and len(code) == 6:
+        return None
+    # ST/*ST 股 5% 涨跌幅
+    if name.startswith(('*ST', 'ST', 'SST')):
+        return 5.0
+    # 创业板 300/301 和 科创板 688: 20%
+    if code.startswith(('300', '301', '688')):
+        return 20.0
+    # 北交所 8xxx/92xxxx/4xxxx: 30%
+    if code.startswith(('8', '920', '4')):
+        return 30.0
+    # 主板默认 10%
+    return 10.0
 
-    data = _em_get(params)
-    if not data or not data.get("data", {}).get("diff"):
-        return 0, False
 
-    items = data["data"]["diff"]
-    count = sum(1 for r in items if cond(_sf(r.get("f3"))))
-
-    # 如果第一页刚好满额，可能还有遗漏，再翻下一页确认
-    if count >= pz:
-        for page in range(2, max_pages + 1):
-            p = dict(params, pn=page)
-            d = _em_get(p)
-            if d and d.get("data", {}).get("diff"):
-                more = sum(1 for r in d["data"]["diff"] if cond(_sf(r.get("f3"))))
-                count += more
-                if more < pz:
-                    break  # 这页没满，说明到尾部了
-            time.sleep(0.3)
-    return count, True
+def _count_limits(items):
+    """从全市场股票数据中精确统计涨停/跌停家数
+    items: [{f3, f12, f14}, ...]
+    返回 (limit_up, limit_down)
+    """
+    limit_up, limit_down = 0, 0
+    for r in items:
+        f3 = r.get("f3")
+        if f3 is None or f3 == "":
+            continue
+        f3v = _sf(f3)
+        code = str(r.get("f12", ""))
+        name = str(r.get("f14", ""))
+        threshold = _get_limit_threshold(code, name)
+        if threshold is None:
+            continue
+        if f3v >= threshold - 0.2:
+            limit_up += 1
+        elif f3v <= -(threshold - 0.2):
+            limit_down += 1
+    return limit_up, limit_down
 
 
 def _fetch_all_market_pages(params, max_retries=3):
@@ -265,24 +268,19 @@ def fetch_sentiment(indices):
     up_count, down_count = None, None
     ratio = "—"
 
-    # 1) 按涨跌幅排序精确统计涨停/跌停
-    limit_up, up_ok = _count_limits_sorted("desc", 9.8)
-    limit_down, down_ok = _count_limits_sorted("asc", 9.8)
-    got_limits = up_ok and down_ok
-
-    # 2) 涨跌家数 — 全市场翻页精确统计
-    # 用东方财富全A股列表，分页遍历每只股票的f3（涨跌幅），精确计数
+    # 1) 涨跌家数 + 涨停/跌停 — 全市场翻页精确统计
+    # 用东方财富全A股列表，分页遍历，按股票代码区分涨跌幅限制
     params = {
         "pn": 1, "pz": 100, "po": 0, "np": 1,
         "ut": "bd1d9ddb04089700cf9c27f6f7426281",
         "fltt": 2, "invt": 2, "fid": "f3",
         "fs": "m:0+t:6,m:0+t:80,m:1+t:2,m:1+t:23,m:0+t:81+s:2048",
-        "fields": "f3",
+        "fields": "f3,f12,f14",
     }
     all_items, total_stocks = _fetch_all_market_pages(params)
-    got_updown = bool(all_items and len(all_items) > 0)
+    got_data = bool(all_items and len(all_items) > 0)
 
-    if got_limits and got_updown:
+    if got_data:
         # ✅ 全市场精确统计
         up = sum(1 for r in all_items if _sf(r.get("f3")) > 0)
         dn = sum(1 for r in all_items if _sf(r.get("f3")) < 0)
@@ -290,15 +288,11 @@ def fetch_sentiment(indices):
         ratio = round(up / dn, 2) if dn > 0 else "—"
         up_count = up
         down_count = dn
+        # 按板块阈值精确统计涨停/跌停
+        limit_up, limit_down = _count_limits(all_items)
         print(f"  Full scan OK: 涨停={limit_up}, 跌停={limit_down}, 涨={up}, 跌={dn}, 平={flat}")
-    elif got_limits:
-        # 只有涨停/跌停，涨跌家数用上日数据
-        print(f"  Limited live data: 涨停={limit_up}, 跌停={limit_down}, 涨跌家数用上日")
-        up_count = last_real["up_count"] if last_real else round(total_stocks * 0.45)
-        down_count = last_real["down_count"] if last_real else round(total_stocks * 0.45)
-        ratio = round(up_count / down_count, 2) if down_count > 0 else "—"
     elif last_real:
-        # ❌ 全挂，用上日真实数据
+        # ❌ 全市场扫描失败，用上日真实数据
         total_amount_str = _calc_total_amount(indices)
         print(f"  All APIs down, using last real data ({last_real['date']})")
         return {
