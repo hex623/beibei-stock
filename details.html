@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>股票深度分析 | Warren H</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-deep: #010102; --bg-page: #08090a; --bg-panel: #0f1011;
+      --bg-surface: #191a1b; --bg-elevated: #23252a;
+      --text-primary: #f7f8f8; --text-secondary: #d0d6e0;
+      --text-muted: #8a8f98; --text-faint: #62666d;
+      --accent: #5e6ad2; --accent-hover: #828fff; --accent-violet: #7170ff;
+      --border-subtle: rgba(255,255,255,0.05); --border-standard: rgba(255,255,255,0.08);
+      --border-solid: #34343a;
+      --success: #10b981; --warning: #f59e0b; --danger: #ef4444;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: var(--bg-page); color: var(--text-secondary);
+      line-height: 1.6; min-height: 100vh;
+    }
+    header {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(8,9,10,0.85); backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .header-inner {
+      max-width: 1000px; margin: 0 auto; padding: 0 24px;
+      height: 60px; display: flex; align-items: center; gap: 16px;
+    }
+    .back-btn {
+      display: flex; align-items: center; gap: 6px;
+      color: var(--text-muted); text-decoration: none;
+      font-size: 14px; font-weight: 500; transition: color 0.2s;
+    }
+    .back-btn:hover { color: var(--text-primary); }
+    .stock-title { font-size: 16px; font-weight: 600; color: var(--text-primary); }
+    .stock-code { font-size: 13px; color: var(--text-faint); font-family: 'JetBrains Mono', monospace; }
+
+    .container { max-width: 1000px; margin: 0 auto; padding: 40px 24px 80px; }
+
+    .hero-section { margin-bottom: 40px; }
+    .hero-section h1 { font-size: 36px; font-weight: 600; color: var(--text-primary); letter-spacing: -1px; margin-bottom: 8px; }
+    .hero-section .meta { font-size: 14px; color: var(--text-faint); display: flex; gap: 16px; align-items: center; }
+    .hero-section .meta .tag { padding: 2px 10px; border-radius: 4px; font-size: 11px; font-weight: 600; background: rgba(94,106,210,0.15); color: var(--accent-violet); border: 1px solid rgba(94,106,210,0.3); }
+
+    .section { background: rgba(255,255,255,0.02); border: 1px solid var(--border-standard); border-radius: 12px; padding: 28px; margin-bottom: 20px; }
+    .section-header { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; }
+    .section-icon { width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+    .section-icon.industry { background: rgba(94,106,210,0.2); }
+    .section-icon.growth { background: rgba(16,185,129,0.2); }
+    .section-icon.valuation { background: rgba(245,158,11,0.2); }
+    .section-icon.decision { background: rgba(99,102,241,0.2); }
+    .section-icon.catalyst { background: rgba(6,182,212,0.2); }
+    .section-icon.risk { background: rgba(239,68,68,0.2); }
+    .section-title { font-size: 16px; font-weight: 600; color: var(--text-primary); }
+    .section-content { font-size: 14px; line-height: 1.8; color: var(--text-secondary); }
+
+    .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; margin-left: 8px; }
+    .badge.bull { background: rgba(16,185,129,0.15); color: var(--success); }
+    .badge.bear { background: rgba(239,68,68,0.15); color: var(--danger); }
+    .badge.info { background: rgba(94,106,210,0.15); color: var(--accent-violet); }
+
+    .not-found { text-align: center; padding: 80px 20px; }
+    .not-found h2 { font-size: 24px; color: var(--text-primary); margin-bottom: 12px; }
+    .not-found p { color: var(--text-muted); margin-bottom: 24px; }
+    .not-found a { color: var(--accent); text-decoration: none; }
+
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+    .section { animation: fadeIn 0.3s ease forwards; }
+    .section:nth-child(2) { animation-delay: 0.05s; }
+    .section:nth-child(3) { animation-delay: 0.10s; }
+    .section:nth-child(4) { animation-delay: 0.15s; }
+    .section:nth-child(5) { animation-delay: 0.20s; }
+    .section:nth-child(6) { animation-delay: 0.25s; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-inner">
+      <a class="back-btn" href="index.html" target="_blank">&larr; 返回池子</a>
+      <span class="stock-title" id="pageTitle">股票深度分析</span>
+      <span class="stock-code" id="pageCode"></span>
+    </div>
+  </header>
+  <div class="container" id="content"></div>
+
+  <script>
+    const analysis = {
+      "工业富联":{
+        code:"601138.SH", sector:"AI服务器代工",
+        industry:"全球最大AI服务器代工厂，英伟达H100/B200核心合作伙伴。AI服务器收入占比从2024年~30%升至2025年~55%，量价齐升逻辑清晰。",
+        growth:"2025营收~7,600亿(+25%)，AI服务器业务增速>150%。净利率虽仅~3.5%（代工模式），但AI服务器收入占比持续提升带动利润结构优化。",
+        valuation:"PE ~18x，低于工业富联历史中枢(25x)。AI服务器业务重塑估值体系，对标全球EMS龙头估值仍有空间。",
+        decision:"卓越型：AI服务器代工绝对龙头，产业逻辑确定性最高。缺点在于毛利率低(<10%)，但这也是护城河——代工规模效应难以复制。关键跟踪：英伟达GB300出货节奏。",
+        catalysts:"1) 英伟达GB300/GB200放量; 2) AI服务器收入占比突破60%; 3) 毛利率回升至5%+",
+        risks:"单一客户(英伟达)依赖度高；代工模式毛利率天花板低；地缘政治风险"
+      },
+      "中际旭创":{
+        code:"300308.SZ", sector:"光模块",
+        industry:"全球光模块市占率第一(约40%)，800G/1.6T光模块核心供应商。AI数据中心光互联从400G→800G→1.6T迭代，带宽需求每18个月翻倍。",
+        growth:"2025营收~300亿(+120%)，净利润~70亿(+150%)。毛利率~35%，净利率~23%，AI光模块利润率远高于传统数通产品。",
+        valuation:"PE ~25x。光模块是AI链中业绩兑现最早、确定性最高的环节之一。PEG<0.2，成长性显著高于估值水平。",
+        decision:"卓越型：全球光模块龙头，800G→1.6T迭代周期中持续受益。技术护城河(硅光/CPO布局)深厚。关键跟踪：1.6T出货节奏及毛利率趋势。",
+        catalysts:"1) 1.6T光模块量产出货; 2) 硅光方案渗透率提升; 3) 海外云厂商资本开支超预期",
+        risks:"光模块强周期属性；2026-2027可能供给过剩；技术迭代(CPO替代)长期风险"
+      },
+      "浪潮信息":{
+        code:"000977.SZ", sector:"AI服务器",
+        industry:"国产AI服务器绝对龙头，市占率~45%。受益国产算力替代和智算中心建设，AI服务器收入占比从~25%提升至~60%。",
+        growth:"2025营收~1,500亿(+60%)，AI服务器收入增速>100%。但毛利率仅~6%（配货模式），利润弹性依赖销量规模。",
+        valuation:"PE ~22x。国产算力替代逻辑+智算中心建设景气，但利润端兑现速度低于收入增速。",
+        decision:"优秀型：国产AI服务器确定性受益者，但利润率低、竞争格局激烈(华为升腾系竞争)。核心跟踪：国产芯片供应量和AI服务器出货量。",
+        catalysts:"1) 国产AI芯片供应放量; 2) 智算中心集中采购; 3) 信创政策加码",
+        risks:"AI芯片供应依赖海光/华为；毛利率偏低利润弹性不足；华为升腾系分流份额"
+      },
+      "天孚通信":{
+        code:"300394.SZ", sector:"光器件/光引擎",
+        industry:"光器件/光引擎龙头，CPO光引擎技术领先。从无源器件→有源器件→光引擎升级，单bit成本持续降低。CPO是光模块的迭代方向。",
+        growth:"2025营收~50亿(+70%)，净利~18亿(+90%)。毛利率~60%，净利率~35%，是AI光通信链中利润率最高标的之一。",
+        valuation:"PE ~35x，高于光模块同行但技术护城河更深。CPO长期空间大，短期业绩确定性高。",
+        decision:"卓越型：CPO技术领先+高利润率+客户锁定(绑定中际旭创/英伟达供应链)。兼具短期业绩确定性和长期技术路线优势。关键跟踪：CPO产品出货进度。",
+        catalysts:"1) CPO光引擎量产出货; 2) 英伟达CPO方案采用; 3) 硅光渗透率提升",
+        risks:"CPO量产时间不及预期；估值偏高；技术路线变更(ELSFP替代)风险"
+      },
+      "润泽科技":{
+        code:"300442.SZ", sector:"AIDC/智算中心",
+        industry:"园区级AIDC/智算中心龙头，卡位核心枢纽节点。AI数据中心电力需求爆发，AIDC机柜租金高于传统IDC 3-5倍。",
+        growth:"2025营收~124亿(+30%)，净利~25亿(+37%)。AIDC业务占比从~20%升至~50%，带动整体毛利率提升。",
+        valuation:"PE ~30x。AIDC资产重、折旧高，但长期稳定现金流属性。PB ~3x合理。",
+        decision:"优秀型：AI数据中心确定性受益者，资产质量好、卡位核心节点。但重资产模式+利率敏感，波动性较高。核心跟踪：机柜上架率和PUE。",
+        catalysts:"1) 智算中心政策加码; 2) 机柜上架率提升; 3) 电力优惠政策",
+        risks:"重资产模式利率敏感；电价上涨压缩利润；AIDC供给过剩风险"
+      },
+      "金山办公":{
+        code:"688111.SH", sector:"AI办公",
+        industry:"国产AI办公绝对龙头，WPS月活~6亿。WPS AI集成大模型能力，推动个人付费转化+政企AI订阅。",
+        growth:"2025营收~75亿(+25%)，净利~28亿(+30%)。AI订阅收入占比~15%，ARR增速>100%。毛利率~85%，净利率~37%。",
+        valuation:"PE ~60x，高于软件行业均值但AI办公赛道空间大。PS ~20x，对标微软Copilot溢价合理。",
+        decision:"优秀型：AI办公受益确定，高毛利率+高客户粘性。但估值偏高，AI变现进度需持续验证。核心跟踪：WPS AI付费转化率和ARR增速。",
+        catalysts:"1) WPS AI付费用户突破; 2) 政企AI办公订阅放量; 3) 国产替代政策",
+        risks:"PE~60x估值偏高；AI付费转化率低于预期；竞争(字节/腾讯)加剧"
+      },
+      "沪电股份":{
+        code:"002463.SZ", sector:"AI服务器PCB",
+        industry:"AI服务器PCB绝对龙头，高端HDI/高速多层板核心供应商。AI服务器PCB层数>24层，单价是普通服务器5-10倍，量价齐升。",
+        growth:"2025营收~100亿(+35%)，净利~20亿(+80%)。AI服务器PCB收入占比从~20%升到~45%，带动毛利率从25%→33%。",
+        valuation:"PE ~25x，合理偏低。PCB行业均值PE~30x，AI业务重估下仍有空间。",
+        decision:"卓越型：五因子全部对齐——①确定性需求(AI服务器PCB爆量)②供给受限(高端产能扩产周期18个月+)③低关注(机构持仓<10%)④价值捕获(定价权强)⑤催化剂(英伟达新平台)。关键跟踪：AI PCB营收占比与毛利率趋势。",
+        catalysts:"1) 英伟达GB300新平台PCB需求; 2) 泰国新工厂投产扩产; 3) AI PCB占比突破50%",
+        risks:"PCB行业周期性；高端产能扩张节奏不及预期；下游AI服务器出货波动"
+      },
+      "海光信息":{
+        code:"688041.SH", sector:"CPU/DCU",
+        industry:"国产CPU/DCU龙头，x86架构兼容性最强。国产AI算力替代核心，DCU(深算系列)对标英伟达A100。",
+        growth:"2025营收~120亿(+50%)，净利~30亿(+55%)。DCU收入占比~45%，增速>80%。毛利率~65%，净利率~25%。",
+        valuation:"PE ~80x，显著偏高但国产算力稀缺标的。PS ~20x，对标海外CPU巨头仍有国产替代溢价。",
+        decision:"优秀型：国产算力稀缺性无可替代，但PE~80x已充分定价。核心跟踪：DCU三代性能对标A100进展+生态适配度。",
+        catalysts:"1) 深算三代性能对标A100; 2) 国产算力集采; 3) 信创政策加码",
+        risks:"PE~80x极高估值；技术路线受制于x86授权；与华为升腾竞争加剧"
+      },
+      "北方华创":{
+        code:"002371.SZ", sector:"半导体设备",
+        industry:"国产半导体设备平台龙头，覆盖刻蚀/薄膜沉积/清洗/氧化扩散四大品类。国产替代加速，2025年国产化率从~15%提升至~25%。",
+        growth:"2025营收~300亿(+45%)，净利~65亿(+55%)。刻蚀+薄膜沉积收入占比~60%，国产化率提升空间大。毛利率~43%。",
+        valuation:"PE ~35x。半导体设备估值中枢35-45x，国产替代溢价合理。PS ~8x。",
+        decision:"卓越型：国产半导体设备平台龙头，品类扩张+国产替代双逻辑。四大品类覆盖完整，客户粘性极强。关键跟踪：新品类拓展和订单增速。",
+        catalysts:"1) 新品类(离子注入/量测)突破; 2) 存储厂订单爆发; 3) 国产化率突破30%",
+        risks:"中美科技管制升级；下游晶圆厂资本开支波动；竞争加剧毛利率承压"
+      },
+      "中微公司":{
+        code:"688012.SH", sector:"刻蚀设备",
+        industry:"国产刻蚀设备龙头，CCP/ICP刻蚀国内第一。3D NAND/先进制程刻蚀步骤增加，刻蚀设备需求增速>晶圆厂资本开支增速。",
+        growth:"2025营收~90亿(+35%)，净利~24亿(+40%)。刻蚀设备收入占比~85%，毛利率~48%。",
+        valuation:"PE ~45x。刻蚀设备壁垒最高、竞争格局最好(全球仅3家)，估值溢价合理。",
+        decision:"卓越型：刻蚀设备国产替代确定性最强，技术壁垒最高。3D NAND层数增加驱动刻蚀设备量价齐升。关键跟踪：5nm以下工艺验证进展。",
+        catalysts:"1) 5nm以下刻蚀验证通过; 2) 存储厂3D NAND扩产; 3) CCP刻蚀份额提升",
+        risks:"高端刻蚀验证周期长；海外设备商降价竞争；估值偏高"
+      },
+      "华海清科":{
+        code:"688120.SH", sector:"CMP设备",
+        industry:"国产CMP(化学机械抛光)设备冠军，国内市占率~60%。CMP是芯片制造的刚需环节，每层芯片都需要CMP。",
+        growth:"2025营收~45亿(+42%)，净利~12亿(+50%)。CMP设备收入占比~90%，毛利率~46%。",
+        valuation:"PE ~40x。CMP设备细分赛道竞争格局好(国内仅2家)，国产替代确定性高。",
+        decision:"优秀型：CMP设备国产冠军，技术+客户壁垒高。但单一品类(仅CMP)天花板有限。核心跟踪：新产品(减薄/清洗)拓展进度。",
+        catalysts:"1) 减薄设备新品放量; 2) 存储厂CMP订单; 3) 国产化率提升",
+        risks:"单一品类天花板有限；新品拓展进度不确定；市值偏小(~400亿)"
+      },
+      "新易盛":{
+        code:"300502.SZ", sector:"光模块",
+        industry:"800G/1.6T光模块龙头，LPO(线性直驱)技术全球领先。光模块从400G→800G→1.6T产品迭代中持续受益。",
+        growth:"2025营收~86亿(+100%)，净利~25亿(+130%)。800G出货量全球前三，1.6T已送样测试。毛利率~38%。",
+        valuation:"PE ~35x。PEG<0.3，增长充分覆盖估值，当前是光模块中业绩弹性最大标的之一。",
+        decision:"优秀型：光模块业绩爆发力最强，LPO技术领先是差异化优势。但强周期属性和竞争加剧是主要风险。核心跟踪：1.6T出货量和LPO客户验证。",
+        catalysts:"1) 1.6T光模块量产出货; 2) LPO客户验证通过; 3) 云厂商800G采购超预期",
+        risks:"光模块强周期，2026-2027可能供给过剩；LPO技术路线不确定性；竞争激烈"
+      },
+      "澜起科技":{
+        code:"688008.SH", sector:"内存接口芯片",
+        industry:"DDR5内存接口芯片全球龙头，全球份额~45%。AI服务器内存容量翻倍+8通道DDR5普及，每台服务器内存接口芯片价值量提升3-5倍。",
+        growth:"2025营收~50亿(+55%)，净利~16亿(+60%)。DDR5渗透率从~40%→~80%提升中。MXC/CXL新业务开始贡献收入。",
+        valuation:"PE ~50x。DDR5渗透+AI服务器双击，PEG<1。全球仅3家竞争对手(瑞萨/澜起)/格局稳定。",
+        decision:"卓越型：内存接口芯片是服务器刚需瓶颈——每根DDR5内存条都需要接口芯片。全球仅3家能做，供给受限。CXL新增长极打开第二曲线。关键跟踪：DDR5渗透率和MXC出货量。",
+        catalysts:"1) DDR5渗透率突破80%; 2) CXL/MXC产品放量; 3) AI服务器内存升级需求",
+        risks:"DDR5渗透率放缓；估值较高(PE~50x)；海外技术管制风险"
+      },
+      "洛阳钼业":{
+        code:"603993.SH", sector:"铜钴（算力金属）",
+        industry:"全球铜钴龙头，TFM+KFM矿山产量全球Top 5。AI数据中心电力需求爆发驱动铜需求结构性增长，每GW数据中心需要~6.5万吨铜。",
+        growth:"2025营收~2,000亿(+12%)，净利~80亿(+30%)。铜产量~55万吨，钴产量~5万吨。TFM混合矿产能翻倍落地。",
+        valuation:"PE ~10x，全球铜矿中最便宜的标的之一。PB ~1.5x，安全边际高。",
+        decision:"卓越型：全球铜钴龙头，PE~10x极度低估，AI电力需求长期逻辑清晰。分红率~40%，股息率~4%。铜价每涨10%，利润增~20%。关键跟踪：铜价走势和TFM达产进度。",
+        catalysts:"1) 铜价上行周期; 2) TFM混合矿达产超预期; 3) AI数据中心铜需求数据验证",
+        risks:"商品周期下行；刚果(金)政治风险；钴价低迷拖累利润"
+      }
+    };
+
+    const sections = [
+      { key: 'industry', label: '产业逻辑', icon: 'industry', emoji: '🏭', desc: 'Q1-Q7: 靠什么赚钱？' },
+      { key: 'growth', label: '业绩增长', icon: 'growth', emoji: '📈', desc: 'Q8-Q13: 能否赚更多？' },
+      { key: 'valuation', label: '估值水平', icon: 'valuation', emoji: '💰', desc: 'Q14-Q18: 是否划算？' },
+      { key: 'decision', label: '投资决策', icon: 'decision', emoji: '🎯', desc: 'Q19-Q20: 买不买？' },
+      { key: 'catalysts', label: '催化剂', icon: 'catalyst', emoji: '⚡', desc: '价值重估触发因素' },
+      { key: 'risks', label: '风险提示', icon: 'risk', emoji: '⚠️', desc: '需要关注的隐患' }
+    ];
+
+    function getStockName() {
+      const params = new URLSearchParams(window.location.search);
+      return params.get('stock') || '';
+    }
+
+    function render() {
+      const name = getStockName();
+      const data = analysis[name];
+      const titleEl = document.getElementById('pageTitle');
+      const codeEl = document.getElementById('pageCode');
+      const contentEl = document.getElementById('content');
+
+      if (!name || !data) {
+        titleEl.textContent = '未找到股票';
+        contentEl.innerHTML = '<div class="not-found"><h2>未找到分析数据</h2><p>请从 <a href="index.html">股票候选池</a> 点击股票查看分析。</p></div>';
+        return;
+      }
+
+      titleEl.textContent = name;
+      codeEl.textContent = data.code + ' · ' + data.sector;
+
+      let html = '<div class="hero-section"><h1>' + name + '</h1><div class="meta"><span class="tag">' + data.sector + '</span><span>' + data.code + '</span><span>深度跟踪池</span></div></div>';
+
+      sections.forEach(s => {
+        html += '<div class="section"><div class="section-header"><div class="section-icon ' + s.icon + '">' + s.emoji + '</div><div class="section-title">' + s.label + ' <span class="badge info">' + s.desc + '</span></div></div><div class="section-content">' + (data[s.key] || '—') + '</div></div>';
+      });
+
+      contentEl.innerHTML = html;
+    }
+
+    render();
+  </script>
+</body>
+</html>
