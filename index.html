@@ -1217,10 +1217,30 @@
     
   </main>
 </div><script>
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", function(){
   fetch("https://api.visitorbadge.io/api/visitors?path=https://hex623.github.io/beibei-stock/&countColor=%23263759")
     .then(r=>r.json()).then(d => {
       document.getElementById("visitorCount").textContent = d.count || "--";
     }).catch(() => {});
+  document.querySelectorAll(".filter-btn").forEach(b => {
+    b.addEventListener("click", function(){
+      document.querySelectorAll(".filter-btn").forEach(x => x.classList.remove("active"));
+      this.classList.add("active");
+      const f = this.dataset.filter;
+      document.querySelectorAll(".stock-card").forEach(c => {
+        c.classList.toggle("hidden", f !== "all" && c.dataset.category !== f);
+      });
+    });
+  });
+  document.querySelectorAll(".view-btn").forEach(b => {
+    b.addEventListener("click", function(){
+      document.querySelectorAll(".view-btn").forEach(x => x.classList.remove("active"));
+      this.classList.add("active");
+      const v = this.dataset.view;
+      document.querySelectorAll(".stock-grid").forEach(g => {
+        g.classList.toggle("list-view", v === "table");
+      });
+    });
+  });
 });
 </script>
