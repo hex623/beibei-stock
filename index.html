@@ -1074,7 +1074,7 @@
 
     <div class="grid-container active" id="observe-grid">
       <div class="stock-grid" style="grid-template-columns:repeat(auto-fill,minmax(280px,1fr))">
-        <div class="stock-card observe-track">
+        <div class="stock-card observe-track" data-category="observe">
           <div class="card-header">
             <div class="stock-info">
               <div class="stock-name">寒武纪</div>
@@ -1086,7 +1086,7 @@
             <div class="stock-desc" style="font-size:13px;color:var(--text-secondary)">持续亏损，市值已9,160亿极高，期待扭亏。AI芯片赛道仍在但竞争激烈。</div>
           </div>
         </div>
-        <div class="stock-card observe-track">
+        <div class="stock-card observe-track" data-category="observe">
           <div class="card-header">
             <div class="stock-info">
               <div class="stock-name">北方稀土</div>
@@ -1098,7 +1098,7 @@
             <div class="stock-desc" style="font-size:13px;color:var(--text-secondary)">亏损中(PE-54)，稀土赛道仍在但短期业绩承压，待扭亏后评估。</div>
           </div>
         </div>
-        <div class="stock-card observe-track">
+        <div class="stock-card observe-track" data-category="observe">
           <div class="card-header">
             <div class="stock-info">
               <div class="stock-name">恒生电子</div>
@@ -1110,7 +1110,7 @@
             <div class="stock-desc" style="font-size:13px;color:var(--text-secondary)">市值397亿<500亿优先区间，金融IT龙头地位稳固。</div>
           </div>
         </div>
-        <div class="stock-card observe-track">
+        <div class="stock-card observe-track" data-category="observe">
           <div class="card-header">
             <div class="stock-info">
               <div class="stock-name">科大讯飞</div>
@@ -1122,7 +1122,7 @@
             <div class="stock-desc" style="font-size:13px;color:var(--text-secondary)">PE-138亏损，大模型竞争加剧(DS/通义等)，待业绩改善评估。</div>
           </div>
         </div>
-        <div class="stock-card observe-track">
+        <div class="stock-card observe-track" data-category="observe">
           <div class="card-header">
             <div class="stock-info">
               <div class="stock-name">德赛西威</div>
@@ -1134,7 +1134,7 @@
             <div class="stock-desc" style="font-size:13px;color:var(--text-secondary)">市值471亿<500亿优先区间，智驾Tier1赛道好。</div>
           </div>
         </div>
-        <div class="stock-card observe-track">
+        <div class="stock-card observe-track" data-category="observe">
           <div class="card-header">
             <div class="stock-info">
               <div class="stock-name">中科创达</div>
@@ -1146,7 +1146,7 @@
             <div class="stock-desc" style="font-size:13px;color:var(--text-secondary)">市值273亿<500亿+增长放缓，端侧AI落地需观察。</div>
           </div>
         </div>
-        <div class="stock-card observe-track">
+        <div class="stock-card observe-track" data-category="observe">
           <div class="card-header">
             <div class="stock-info">
               <div class="stock-name">科沃斯</div>
@@ -1228,7 +1228,7 @@ document.addEventListener("DOMContentLoaded", function(){
       this.classList.add("active");
       const f = this.dataset.filter;
       document.querySelectorAll(".stock-card").forEach(c => {
-        c.classList.toggle("hidden", f !== "all" && c.dataset.category !== f);
+        c.classList.toggle("hidden", f !== "all" && c.dataset.category && c.dataset.category !== "observe" && c.dataset.category !== f);
       });
     });
   });
