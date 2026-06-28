@@ -3,32 +3,618 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>beibei stock - AI股票池</title>
-  <link rel="stylesheet" href="style.css">
-  <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
-  
+  <title>AI产业股票候选池 | Warren H</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-deep: #010102;
+      --bg-page: #08090a;
+      --bg-panel: #0f1011;
+      --bg-surface: #191a1b;
+      --bg-elevated: #23252a;
+      --text-primary: #f7f8f8;
+      --text-secondary: #d0d6e0;
+      --text-muted: #8a8f98;
+      --text-faint: #62666d;
+      --accent: #5e6ad2;
+      --accent-hover: #828fff;
+      --accent-violet: #7170ff;
+      --border-subtle: rgba(255,255,255,0.05);
+      --border-standard: rgba(255,255,255,0.08);
+      --border-solid: #34343a;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --deep-track: rgba(94,106,210,0.15);
+      --regular-track: rgba(255,255,255,0.03);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      font-feature-settings: "cv01", "ss03";
+      background: var(--bg-page);
+      color: var(--text-secondary);
+      line-height: 1.5;
+      min-height: 100vh;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(8,9,10,0.85);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .header-inner {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 32px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text-primary);
+      letter-spacing: -0.3px;
+    }
+
+    .logo-icon {
+      width: 32px;
+      height: 32px;
+      background: var(--accent);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 14px;
+      font-weight: 500;
+      color: white;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 32px;
+      align-items: center;
+    }
+
+    .nav-links a {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: color 0.2s;
+      letter-spacing: -0.1px;
+    }
+
+    .nav-links a:hover {
+      color: var(--text-primary);
+    }
+
+    .nav-links a.active {
+      color: var(--text-primary);
+    }
+
+    .last-update {
+      font-size: 12px;
+      color: var(--text-faint);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .hero {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 80px 32px 48px;
+    }
+
+    .hero h1 {
+      font-size: 48px;
+      font-weight: 600;
+      color: var(--text-primary);
+      letter-spacing: -1.5px;
+      line-height: 1.1;
+      margin-bottom: 16px;
+    }
+
+    .hero-subtitle {
+      font-size: 18px;
+      color: var(--text-muted);
+      line-height: 1.6;
+      max-width: 700px;
+      margin-bottom: 40px;
+    }
+
+    .stats-bar {
+      display: flex;
+      gap: 48px;
+      padding: 24px 0;
+      border-top: 1px solid var(--border-subtle);
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .stat-item {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .stat-item.deep .stat-value { color: var(--accent-violet); }
+    .stat-item.regular .stat-value { color: var(--text-muted); }
+
+    .stat-value {
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--text-primary);
+      font-family: 'JetBrains Mono', monospace;
+      letter-spacing: -1px;
+    }
+
+    .stat-label {
+      font-size: 13px;
+      color: var(--text-faint);
+      font-weight: 500;
+    }
+
+    .main {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 32px 64px;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      margin-bottom: 32px;
+    }
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .section-badge {
+      padding: 4px 12px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      font-family: 'JetBrains Mono', monospace;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .section-badge.deep {
+      background: rgba(94,106,210,0.15);
+      color: var(--accent-violet);
+      border: 1px solid rgba(94,106,210,0.3);
+    }
+
+    .section-badge.regular {
+      background: rgba(255,255,255,0.03);
+      color: var(--text-muted);
+      border: 1px solid var(--border-standard);
+    }
+
+    .section-title h2 {
+      font-size: 24px;
+      font-weight: 600;
+      color: var(--text-primary);
+      letter-spacing: -0.5px;
+    }
+
+    .section-count {
+      font-size: 14px;
+      color: var(--text-faint);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .stock-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+      gap: 16px;
+    }
+
+    .stock-card {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid var(--border-standard);
+      border-radius: 12px;
+      padding: 24px;
+      transition: all 0.2s ease;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stock-card:hover {
+      background: rgba(255,255,255,0.04);
+      border-color: rgba(255,255,255,0.12);
+      transform: translateY(-2px);
+    }
+
+    .stock-card.deep-track {
+      border-left: 3px solid var(--accent);
+    }
+
+    .stock-card.regular-track {
+      border-left: 3px solid var(--border-solid);
+    }
+
+    .card-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .stock-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .stock-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      font-weight: 600;
+      color: white;
+      flex-shrink: 0;
+    }
+
+    .stock-icon.chip { background: #8b5cf6; }
+    .stock-icon.server { background: #3b82f6; }
+    .stock-icon.optical { background: #06b6d4; }
+    .stock-icon.datacenter { background: #10b981; }
+    .stock-icon.cooling { background: #0ea5e9; }
+    .stock-icon.model { background: #f59e0b; }
+    .stock-icon.office { background: #ec4899; }
+    .stock-icon.finance { background: #22c55e; }
+    .stock-icon.auto { background: #f97316; }
+    .stock-icon.medical { background: #ef4444; }
+    .stock-icon.robot { background: #6366f1; }
+    .stock-icon.security { background: #14b8a6; }
+    .stock-icon.copper { background: #d97706; }
+    .stock-icon.rare_earth { background: #7c3aed; }
+    .stock-icon.tungsten { background: #64748b; }
+
+    .stock-name-group {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .stock-name {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-primary);
+      letter-spacing: -0.2px;
+    }
+
+    .stock-code {
+      font-size: 13px;
+      color: var(--text-faint);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .stock-tag {
+      padding: 3px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      font-family: 'JetBrains Mono', monospace;
+      white-space: nowrap;
+    }
+
+    .stock-tag.deep {
+      background: var(--deep-track);
+      color: var(--accent-violet);
+      border: 1px solid rgba(94,106,210,0.3);
+    }
+
+    .stock-tag.regular {
+      background: var(--regular-track);
+      color: var(--text-muted);
+      border: 1px solid var(--border-standard);
+    }
+
+    .card-body {
+      margin-bottom: 16px;
+    }
+
+    .stock-sector {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+      font-weight: 500;
+    }
+
+    .stock-desc {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .card-metrics {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    .metric {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .metric-label {
+      font-size: 11px;
+      color: var(--text-faint);
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .metric-value {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-primary);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .metric-value.positive {
+      color: var(--success);
+    }
+
+    .metric-value.negative {
+      color: var(--danger);
+    }
+
+    .card-risk {
+      margin-top: 12px;
+      padding-top: 10px;
+      border-top: 1px dashed rgba(239,68,68,0.2);
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .risk-label {
+      white-space: nowrap;
+      font-weight: 600;
+      color: var(--warning);
+      font-size: 11px;
+      padding: 1px 6px;
+      border-radius: 3px;
+      background: rgba(245,158,11,0.1);
+      flex-shrink: 0;
+    }
+
+    .risk-text {
+      color: var(--text-muted);
+    }
+
+    .filters {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+
+    .filter-btn {
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 500;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid var(--border-standard);
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: inherit;
+    }
+
+    .filter-btn:hover {
+      background: rgba(255,255,255,0.04);
+      border-color: rgba(255,255,255,0.12);
+      color: var(--text-primary);
+    }
+
+    .filter-btn.active {
+      background: rgba(94,106,210,0.15);
+      border-color: rgba(94,106,210,0.3);
+      color: var(--accent-violet);
+    }
+
+    .view-toggle {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+
+    .view-btn {
+      padding: 4px 12px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 500;
+      background: transparent;
+      border: 1px solid var(--border-standard);
+      color: var(--text-faint);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: inherit;
+    }
+
+    .view-btn.active {
+      background: var(--bg-elevated);
+      color: var(--text-primary);
+      border-color: var(--border-solid);
+    }
+
+    .grid-container { display: block; }
+    .grid-container.hidden { display: none; }
+    .table-container { display: none; }
+    .table-container.active { display: block; }
+
+    .stock-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    .stock-table th {
+      text-align: left;
+      padding: 12px 16px;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-faint);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 1px solid var(--border-standard);
+    }
+
+    .stock-table td {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+    }
+
+    .stock-table tr:hover td {
+      background: rgba(255,255,255,0.02);
+    }
+
+    .stock-name-cell {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .stock-name-cell .stock-icon {
+      width: 32px;
+      height: 32px;
+      font-size: 11px;
+    }
+
+    footer {
+      margin-top: 64px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    .footer-inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+    }
+
+    .footer-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text-faint);
+    }
+
+    .update-badge {
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      background: rgba(16,185,129,0.1);
+      color: var(--success);
+      border: 1px solid rgba(16,185,129,0.2);
+    }
+
+    .footer-right a {
+      color: var(--text-muted);
+      text-decoration: none;
+      margin-left: 24px;
+      transition: color 0.2s;
+    }
+
+    .footer-right a:hover {
+      color: var(--text-primary);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .stock-card {
+      animation: fadeIn 0.4s ease both;
+    }
+
+        .stock-card:nth-child(1) { animation-delay: 0.00s; }
+    .stock-card:nth-child(2) { animation-delay: 0.05s; }
+    .stock-card:nth-child(3) { animation-delay: 0.10s; }
+    .stock-card:nth-child(4) { animation-delay: 0.15s; }
+    .stock-card:nth-child(5) { animation-delay: 0.20s; }
+    .stock-card:nth-child(6) { animation-delay: 0.25s; }
+    .stock-card:nth-child(7) { animation-delay: 0.30s; }
+    .stock-card:nth-child(8) { animation-delay: 0.35s; }
+    .stock-card:nth-child(9) { animation-delay: 0.40s; }
+    .stock-card:nth-child(10) { animation-delay: 0.45s; }
+    .stock-card:nth-child(11) { animation-delay: 0.50s; }
+    .stock-card:nth-child(12) { animation-delay: 0.55s; }
+    .stock-card:nth-child(13) { animation-delay: 0.60s; }
+    .stock-card:nth-child(14) { animation-delay: 0.65s; }
+    .stock-card:nth-child(15) { animation-delay: 0.70s; }
+  </style>
 </head>
 <body>
-  <div class="top-bar">
-    <div class="top-bar-brand">
-      <h1>beibei stock</h1>
-      <span class="top-bar-sub">AI股票池</span>
+  <header>
+    <div class="header-inner">
+      <div class="logo">
+        <div class="logo-icon">AI</div>
+        <span>AI产业股票候选池</span>
+      </div>
+      <nav class="nav-links">
+        <a href="#deep" class="active">深度跟踪池</a>
+        <a href="#regular">常规覆盖池</a>
+        <a href="#observe">观察池</a>
+        <a href="#rules">筛选规则</a>
+      </nav>
+      <div class="last-update">更新: 2026-06-29 · v2.0 融合瓶颈理论+趋势获利法</div>
     </div>
-    
-    <div class="visitor-count">👁 <span id="visitorCount">--</span></div>
-  </div>
-
-    <div id="pool-view" class="pool-page">
+  </header>
 
   <section class="hero">
     <h1>AI产业股票候选池</h1>
-    <p class="hero-subtitle">围绕芯片、算力、模型和应用三大主线，基于 <strong>dongdong-stock</strong> 三层筛选体系动态维护，聚焦 AI 产业链核心标的。</p>
-    <div class="hero-stats">
-      <div class="stat-item">
+    <p class="hero-subtitle">围绕芯片、算力、模型和应用三大主线，融合瓶颈理论赛道选择与趋势获利法择时，基于六阶段闭环投资体系动态维护，聚焦 AI 产业链核心标的。</p>
+    <div class="stats-bar">
+      <div class="stat-item deep">
         <span class="stat-value">13</span>
         <span class="stat-label">深度跟踪池</span>
       </div>
-      <div class="stat-item">
+      <div class="stat-item regular">
         <span class="stat-value">12</span>
         <span class="stat-label">常规覆盖池</span>
       </div>
@@ -51,16 +637,6 @@
     </div>
   </section>
 
-  <!-- Section quick nav -->
-  <div class="main">
-    <div class="pool-nav-bar">
-      <a href="#deep" class="pool-nav-link">深度跟踪池</a>
-      <a href="#regular" class="pool-nav-link">常规覆盖池</a>
-      <a href="#observe" class="pool-nav-link">观察池</a>
-      <a href="#rules" class="pool-nav-link">筛选规则</a>
-    </div>
-  </div>
-
   <main class="main">
     <!-- Deep Track Pool -->
     <div class="section-header" id="deep">
@@ -68,7 +644,7 @@
         <span class="section-badge deep">DEEP TRACK</span>
         <h2>深度跟踪池</h2>
       </div>
-      <div class="section-count">13 家公司</div>
+      <div class="section-count">15 家公司</div>
     </div>
 
     <div class="filters">
@@ -82,9 +658,12 @@
       <button class="filter-btn" data-filter="equipment">半导体设备</button>
       <button class="filter-btn" data-filter="finance">金融AI</button>
       <button class="filter-btn" data-filter="copper">算力金属-铜钴</button>
+      <button class="filter-btn" data-filter="rare_earth">算力金属-稀土</button>
       <button class="filter-btn" data-filter="packaging">先进封装</button>
       <button class="filter-btn" data-filter="foundry">晶圆代工</button>
       <button class="filter-btn" data-filter="material">半导体材料</button>
+      <button class="filter-btn" data-filter="model">大模型</button>
+      <button class="filter-btn" data-filter="auto">智能驾驶</button>
       <button class="filter-btn" data-filter="tungsten">算力金属-钨</button>
     </div>
 
@@ -108,7 +687,7 @@
           </div>
           <div class="card-body">
             <div class="stock-sector">AI服务器代工</div>
-            <div class="stock-desc">全球AI服务器制造绝对龙头，绑定英伟达GH200，云计算营收6027亿(+89%)。</div>
+            <div class="stock-desc">全球AI服务器制造绝对龙头，绑定英伟达GH200，云计算营收6027亿(+89%)，业绩确定性最强。</div>
           </div>
           <div class="card-metrics">
             <div class="metric">
@@ -130,7 +709,7 @@
           </div>
           <div class="card-risk">
             <span class="risk-label">⚠️ 风险</span>
-            <span class="risk-text">单一客户依赖度高(英伟达)，毛利率偏低(<10%)。</span>
+            <span class="risk-text">单一客户依赖度高(英伟达)，毛利率偏低(<10%)，代工模式利润空间有限。</span>
           </div>
         </div>
         <div class="stock-card deep-track" data-category="optical">
@@ -168,7 +747,7 @@
           </div>
           <div class="card-risk">
             <span class="risk-label">⚠️ 风险</span>
-            <span class="risk-text">光模块强周期属性，1.6T技术迭代节奏不确定，海外客户集中。</span>
+            <span class="risk-text">光模块强周期属性，800G→1.6T切换期需求节奏不确定，2026年供给过剩风险。</span>
           </div>
         </div>
         <div class="stock-card deep-track" data-category="server">
@@ -184,29 +763,29 @@
           </div>
           <div class="card-body">
             <div class="stock-sector">AI服务器</div>
-            <div class="stock-desc">国产AI服务器绝对龙头，液冷技术领先，深度绑定国内大客户。</div>
+            <div class="stock-desc">国产AI服务器绝对龙头，国内市占率>50%，营收体量最大，国产算力底座核心。</div>
           </div>
           <div class="card-metrics">
             <div class="metric">
               <span class="metric-label">2025营收</span>
-              <span class="metric-value">738亿</span>
+              <span class="metric-value">1,648亿</span>
             </div>
             <div class="metric">
               <span class="metric-label">净利润</span>
-              <span class="metric-value positive">+35%</span>
+              <span class="metric-value positive">+5%</span>
             </div>
             <div class="metric">
-              <span class="metric-label">AI服务器</span>
-              <span class="metric-value">国内Top1</span>
+              <span class="metric-label">国内市占率</span>
+              <span class="metric-value">>50%</span>
             </div>
             <div class="metric">
-              <span class="metric-label">液冷专利</span>
-              <span class="metric-value">领先</span>
+              <span class="metric-label">全球地位</span>
+              <span class="metric-value">Top 2</span>
             </div>
           </div>
           <div class="card-risk">
             <span class="risk-label">⚠️ 风险</span>
-            <span class="risk-text">服务器毛利率低(<12%)，国内AI算力资本开支节奏影响大。</span>
+            <span class="risk-text">制裁风险(被美国实体清单关注)，毛利率极低(<5%)，净利率仅+5%增长乏力。</span>
           </div>
         </div>
         <div class="stock-card deep-track" data-category="optical">
@@ -222,29 +801,29 @@
           </div>
           <div class="card-body">
             <div class="stock-sector">光器件/光引擎</div>
-            <div class="stock-desc">CPO/光引擎技术领先，全球唯一实现光引擎量产。</div>
+            <div class="stock-desc">CPO/光引擎技术领先，绑定英伟达供应链，光模块上游核心稀缺供应商。</div>
           </div>
           <div class="card-metrics">
             <div class="metric">
               <span class="metric-label">2025营收</span>
-              <span class="metric-value">35亿</span>
+              <span class="metric-value">52亿</span>
             </div>
             <div class="metric">
               <span class="metric-label">净利润</span>
-              <span class="metric-value positive">+95%</span>
+              <span class="metric-value positive">+50%</span>
             </div>
             <div class="metric">
-              <span class="metric-label">光引擎</span>
-              <span class="metric-value">全球唯一</span>
+              <span class="metric-label">有源器件增速</span>
+              <span class="metric-value positive">+81%</span>
             </div>
             <div class="metric">
-              <span class="metric-label">技术壁垒</span>
-              <span class="metric-value">极高</span>
+              <span class="metric-label">行业地位</span>
+              <span class="metric-value">Top 1</span>
             </div>
           </div>
           <div class="card-risk">
             <span class="risk-label">⚠️ 风险</span>
-            <span class="risk-text">产品线单一(光引擎)，PE估值极高(176x)，客户集中。</span>
+            <span class="risk-text">客户集中度高，有源器件赛道竞争加剧，市值偏小波动大。</span>
           </div>
         </div>
         <div class="stock-card deep-track" data-category="datacenter">
@@ -260,29 +839,67 @@
           </div>
           <div class="card-body">
             <div class="stock-sector">AIDC/智算中心</div>
-            <div class="stock-desc">园区级数据中心龙头，字节百亿长单，AIDC进入业绩释放期。</div>
+            <div class="stock-desc">园区级数据中心龙头，AIDC业务从培育期进入业绩释放期，与字节跳动签订百亿长单。</div>
           </div>
           <div class="card-metrics">
             <div class="metric">
               <span class="metric-label">2025营收</span>
-              <span class="metric-value">89亿</span>
+              <span class="metric-value">57亿</span>
             </div>
             <div class="metric">
               <span class="metric-label">净利润</span>
-              <span class="metric-value positive">+65%</span>
+              <span class="metric-value positive">+182%</span>
             </div>
             <div class="metric">
-              <span class="metric-label">字节订单</span>
-              <span class="metric-value">百亿级</span>
+              <span class="metric-label">AIDC占比</span>
+              <span class="metric-value">44%</span>
             </div>
             <div class="metric">
-              <span class="metric-label">AIDC</span>
-              <span class="metric-value">领先</span>
+              <span class="metric-label">行业地位</span>
+              <span class="metric-value">Top 1</span>
             </div>
           </div>
           <div class="card-risk">
             <span class="risk-label">⚠️ 风险</span>
-            <span class="risk-text">重资产模式，资本开支大，利率上行增加财务成本。</span>
+            <span class="risk-text">AIDC前期投入大，资本开支高峰期现金流压力大，竞争加剧。</span>
+          </div>
+        </div>
+        <div class="stock-card deep-track" data-category="cooling">
+          <div class="card-header">
+            <div class="stock-info">
+              <div class="stock-icon cooling">英</div>
+              <div class="stock-name-group">
+                <div class="stock-name">英维克</div>
+                <div class="stock-code">002837.SZ</div>
+              </div>
+            </div>
+            <span class="stock-tag deep">深度跟踪</span>
+          </div>
+          <div class="card-body">
+            <div class="stock-sector">液冷温控</div>
+            <div class="stock-desc">液冷从"可选"变"刚需"，2025年产业化元年，绑定华为/百度/阿里，温控龙头。</div>
+          </div>
+          <div class="card-metrics">
+            <div class="metric">
+              <span class="metric-label">2025营收</span>
+              <span class="metric-value">61亿</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">净利润</span>
+              <span class="metric-value">—</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">液冷营收</span>
+              <span class="metric-value positive">2亿+</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">行业地位</span>
+              <span class="metric-value">Top 1</span>
+            </div>
+          </div>
+          <div class="card-risk">
+            <span class="risk-label">⚠️ 风险</span>
+            <span class="risk-text">液冷仍处产业化初期，净利润数据缺失(—)，业绩释放节奏不确定。</span>
           </div>
         </div>
         <div class="stock-card deep-track" data-category="office">
@@ -298,29 +915,29 @@
           </div>
           <div class="card-body">
             <div class="stock-sector">AI办公</div>
-            <div class="stock-desc">AI办公绝对龙头，WPS AI月活增3倍，国产替代空间广阔。</div>
+            <div class="stock-desc">AI办公绝对龙头，WPS AI月活增3倍，订阅模式优质，国产替代核心。</div>
           </div>
           <div class="card-metrics">
             <div class="metric">
               <span class="metric-label">2025营收</span>
-              <span class="metric-value">78亿</span>
+              <span class="metric-value">59亿</span>
             </div>
             <div class="metric">
               <span class="metric-label">净利润</span>
-              <span class="metric-value positive">+40%</span>
+              <span class="metric-value positive">+12%</span>
             </div>
             <div class="metric">
-              <span class="metric-label">WPS AI</span>
-              <span class="metric-value">月活3x</span>
+              <span class="metric-label">WPS 365增速</span>
+              <span class="metric-value positive">+65%</span>
             </div>
             <div class="metric">
-              <span class="metric-label">市占率</span>
-              <span class="metric-value">国内第一</span>
+              <span class="metric-label">行业地位</span>
+              <span class="metric-value">Top 1</span>
             </div>
           </div>
           <div class="card-risk">
             <span class="risk-label">⚠️ 风险</span>
-            <span class="risk-text">信创推进节奏不确定，个人付费意愿低，C端增长放缓。</span>
+            <span class="risk-text">个人付费转化率偏低，C端AI订阅兑现待验证，政企采购周期有波动。</span>
           </div>
         </div>
         <div class="stock-card deep-track" data-category="chip">
@@ -336,35 +953,35 @@
           </div>
           <div class="card-body">
             <div class="stock-sector">CPU/DCU</div>
-            <div class="stock-desc">AI算力国产化核心，CPU+DCU双轮驱动，国产替代最确定。</div>
+            <div class="stock-desc">国产算力核心，深算系列兼容CUDA生态，CPU+DCU双轮驱动，AI算力国产化核心受益。</div>
           </div>
           <div class="card-metrics">
             <div class="metric">
               <span class="metric-label">2025营收</span>
-              <span class="metric-value">198亿</span>
+              <span class="metric-value">144亿</span>
             </div>
             <div class="metric">
               <span class="metric-label">净利润</span>
-              <span class="metric-value positive">+58%</span>
+              <span class="metric-value positive">+32%</span>
             </div>
             <div class="metric">
-              <span class="metric-label">国产CPU</span>
-              <span class="metric-value">Top1</span>
+              <span class="metric-label">增速</span>
+              <span class="metric-value positive">+57%</span>
             </div>
             <div class="metric">
-              <span class="metric-label">DCU</span>
-              <span class="metric-value">高速增长</span>
+              <span class="metric-label">行业地位</span>
+              <span class="metric-value">Top 1</span>
             </div>
           </div>
           <div class="card-risk">
             <span class="risk-label">⚠️ 风险</span>
-            <span class="risk-text">美国制裁风险，制程工艺受限(7nm)，估值偏高。</span>
+            <span class="risk-text">先进制程受限(被制裁)，产能扩张受制于代工伙伴，估值偏高。</span>
           </div>
         </div>
         <div class="stock-card deep-track" data-category="equipment">
           <div class="card-header">
             <div class="stock-info">
-              <div class="stock-icon equipment">北</div>
+              <div class="stock-icon chip">北</div>
               <div class="stock-name-group">
                 <div class="stock-name">北方华创</div>
                 <div class="stock-code">002371.SZ</div>
@@ -373,36 +990,36 @@
             <span class="stock-tag deep">深度跟踪</span>
           </div>
           <div class="card-body">
-            <div class="stock-sector">半导体设备</div>
-            <div class="stock-desc">半导体设备平台龙头，刻蚀/薄膜/PVD全布局，国产替代核心受益。</div>
+            <div class="stock-sector">半导体设备平台</div>
+            <div class="stock-desc">国产设备平台龙头，刻蚀/薄膜/PVD/热处理全布局，国产替代黄金赛道核心标的。</div>
           </div>
           <div class="card-metrics">
             <div class="metric">
               <span class="metric-label">2025营收</span>
-              <span class="metric-value">385亿</span>
+              <span class="metric-value">394亿</span>
             </div>
             <div class="metric">
               <span class="metric-label">净利润</span>
-              <span class="metric-value positive">+62%</span>
+              <span class="metric-value positive">+31%</span>
             </div>
             <div class="metric">
-              <span class="metric-label">设备种类</span>
-              <span class="metric-value">最全</span>
+              <span class="metric-label">增速</span>
+              <span class="metric-value positive">+31%</span>
             </div>
             <div class="metric">
-              <span class="metric-label">国产化率</span>
-              <span class="metric-value">提升中</span>
+              <span class="metric-label">行业地位</span>
+              <span class="metric-value">Top 1</span>
             </div>
           </div>
           <div class="card-risk">
             <span class="risk-label">⚠️ 风险</span>
-            <span class="risk-text">美国设备出口管制升级风险，资本开支密集，客户集中。</span>
+            <span class="risk-text">估值偏高(PE>50)，海外设备巨头竞争压力，国产替代空间随进度递减。</span>
           </div>
         </div>
         <div class="stock-card deep-track" data-category="equipment">
           <div class="card-header">
             <div class="stock-info">
-              <div class="stock-icon equipment">中</div>
+              <div class="stock-icon chip">微</div>
               <div class="stock-name-group">
                 <div class="stock-name">中微公司</div>
                 <div class="stock-code">688012.SH</div>
@@ -412,58 +1029,20 @@
           </div>
           <div class="card-body">
             <div class="stock-sector">刻蚀设备</div>
-            <div class="stock-desc">刻蚀国内第一，CCP/ICP刻蚀全覆盖，3D NAND/逻辑双重受益。</div>
+            <div class="stock-desc">刻蚀设备国产第一，LPCVD爆发+224%，平台化加速，5nm以下先进制程突破。</div>
           </div>
           <div class="card-metrics">
             <div class="metric">
               <span class="metric-label">2025营收</span>
-              <span class="metric-value">112亿</span>
+              <span class="metric-value">124亿</span>
             </div>
             <div class="metric">
               <span class="metric-label">净利润</span>
-              <span class="metric-value positive">+48%</span>
+              <span class="metric-value positive">+30%</span>
             </div>
             <div class="metric">
-              <span class="metric-label">刻蚀</span>
-              <span class="metric-value">国内第一</span>
-            </div>
-            <div class="metric">
-              <span class="metric-label">毛利率</span>
-              <span class="metric-value">45%</span>
-            </div>
-          </div>
-          <div class="card-risk">
-            <span class="risk-label">⚠️ 风险</span>
-            <span class="risk-text">高端刻蚀仍落后Lam/AMAT，研发投入大，盈利波动。</span>
-          </div>
-        </div>
-        <div class="stock-card deep-track" data-category="equipment">
-          <div class="card-header">
-            <div class="stock-info">
-              <div class="stock-icon equipment">清</div>
-              <div class="stock-name-group">
-                <div class="stock-name">华海清科</div>
-                <div class="stock-code">688120.SH</div>
-              </div>
-            </div>
-            <span class="stock-tag deep">深度跟踪</span>
-          </div>
-          <div class="card-body">
-            <div class="stock-sector">CMP设备</div>
-            <div class="stock-desc">CMP设备国产龙头，12英寸CMP国内市占率>60%，受益晶圆厂扩产。</div>
-          </div>
-          <div class="card-metrics">
-            <div class="metric">
-              <span class="metric-label">2025营收</span>
-              <span class="metric-value">45亿</span>
-            </div>
-            <div class="metric">
-              <span class="metric-label">净利润</span>
-              <span class="metric-value positive">+55%</span>
-            </div>
-            <div class="metric">
-              <span class="metric-label">CMP市占率</span>
-              <span class="metric-value">>60%</span>
+              <span class="metric-label">增速</span>
+              <span class="metric-value positive">+37%</span>
             </div>
             <div class="metric">
               <span class="metric-label">行业地位</span>
@@ -472,45 +1051,7 @@
           </div>
           <div class="card-risk">
             <span class="risk-label">⚠️ 风险</span>
-            <span class="risk-text">产品线单一(主要为CMP)，估值偏高，客户集中度高。</span>
-          </div>
-        </div>
-        <div class="stock-card deep-track" data-category="optical">
-          <div class="card-header">
-            <div class="stock-info">
-              <div class="stock-icon optical">新</div>
-              <div class="stock-name-group">
-                <div class="stock-name">新易盛</div>
-                <div class="stock-code">300502.SZ</div>
-              </div>
-            </div>
-            <span class="stock-tag deep">深度跟踪</span>
-          </div>
-          <div class="card-body">
-            <div class="stock-sector">光模块</div>
-            <div class="stock-desc">高速光模块龙头，800G/1.6T技术领先，深度绑定海外大客户。</div>
-          </div>
-          <div class="card-metrics">
-            <div class="metric">
-              <span class="metric-label">2025营收</span>
-              <span class="metric-value">65亿</span>
-            </div>
-            <div class="metric">
-              <span class="metric-label">净利润</span>
-              <span class="metric-value positive">+80%</span>
-            </div>
-            <div class="metric">
-              <span class="metric-label">800G占比</span>
-              <span class="metric-value">>50%</span>
-            </div>
-            <div class="metric">
-              <span class="metric-label">行业地位</span>
-              <span class="metric-value">Top 3</span>
-            </div>
-          </div>
-          <div class="card-risk">
-            <span class="risk-label">⚠️ 风险</span>
-            <span class="risk-text">光模块强周期属性，客户集中度高，1.6T技术迭代节奏不确定。</span>
+            <span class="risk-text">估值高企，刻蚀国产化空间随制程提升边际递减，海外管制风险。</span>
           </div>
         </div>
         <div class="stock-card deep-track" data-category="finance">
@@ -526,29 +1067,29 @@
           </div>
           <div class="card-body">
             <div class="stock-sector">金融AI</div>
-            <div class="stock-desc">互联网券商龙头，PE 21x低估，AI赋能证券业务双轮驱动。</div>
+            <div class="stock-desc">金融AI+互联网券商双轮驱动，PE 25-30x历史低估，市场回暖弹性极大。</div>
           </div>
           <div class="card-metrics">
             <div class="metric">
               <span class="metric-label">2025营收</span>
-              <span class="metric-value">186亿</span>
+              <span class="metric-value">161亿</span>
             </div>
             <div class="metric">
               <span class="metric-label">净利润</span>
-              <span class="metric-value positive">+22%</span>
+              <span class="metric-value">—</span>
             </div>
             <div class="metric">
-              <span class="metric-label">PE</span>
-              <span class="metric-value positive">21x</span>
+              <span class="metric-label">增速</span>
+              <span class="metric-value positive">+38%</span>
             </div>
             <div class="metric">
-              <span class="metric-label">毛利率</span>
-              <span class="metric-value">85%</span>
+              <span class="metric-label">行业地位</span>
+              <span class="metric-value">Top 1</span>
             </div>
           </div>
           <div class="card-risk">
             <span class="risk-label">⚠️ 风险</span>
-            <span class="risk-text">市场成交低迷影响证券收入，AI落地速度慢于预期。</span>
+            <span class="risk-text">券商板块强β属性，市场成交量下滑直接影响业绩，监管政策风险。</span>
           </div>
         </div>
         <div class="stock-card deep-track" data-category="copper">
@@ -563,50 +1104,436 @@
             <span class="stock-tag deep">深度跟踪</span>
           </div>
           <div class="card-body">
-            <div class="stock-sector">算力金属-铜钴</div>
-            <div class="stock-desc">全球铜钴龙头，PE~12x，AI数据中心铜需求最直接映射。</div>
+            <div class="stock-sector">铜钴（算力金属）</div>
+            <div class="stock-desc">全球铜钴龙头，TFM+KFM矿山产能翻倍，PE~10x全球低估，AI数据中心铜需求最直接映射。</div>
           </div>
           <div class="card-metrics">
             <div class="metric">
               <span class="metric-label">2025营收</span>
-              <span class="metric-value">2,500亿</span>
+              <span class="metric-value">~2000亿</span>
             </div>
             <div class="metric">
               <span class="metric-label">净利润</span>
-              <span class="metric-value positive">+25%</span>
+              <span class="metric-value positive">+30%+</span>
             </div>
             <div class="metric">
               <span class="metric-label">铜产量</span>
-              <span class="metric-value">全球Top5</span>
+              <span class="metric-value">~55万吨</span>
             </div>
             <div class="metric">
               <span class="metric-label">PE</span>
-              <span class="metric-value positive">~12x</span>
+              <span class="metric-value">~10x</span>
             </div>
           </div>
           <div class="card-risk">
             <span class="risk-label">⚠️ 风险</span>
-            <span class="risk-text">大宗商品周期性强，铜钴价格波动大，海外矿产地缘政治风险。</span>
+            <span class="risk-text">大宗商品强周期属性，铜价波动直接影响业绩弹性，刚果(金)地缘政治风险。</span>
+          </div>
+        </div>
+        <div class="stock-card deep-track" data-category="rare_earth">
+          <div class="card-header">
+            <div class="stock-info">
+              <div class="stock-icon rare_earth">稀</div>
+              <div class="stock-name-group">
+                <div class="stock-name">北方稀土</div>
+                <div class="stock-code">600010.SH</div>
+              </div>
+            </div>
+            <span class="stock-tag deep">深度跟踪</span>
+          </div>
+          <div class="card-body">
+            <div class="stock-sector">稀土永磁（算力金属）</div>
+            <div class="stock-desc">全球稀土绝对龙头，配额占全国60%+，人形机器人量产将引爆钕铁硼需求，护城河极深。</div>
+          </div>
+          <div class="card-metrics">
+            <div class="metric">
+              <span class="metric-label">2025营收</span>
+              <span class="metric-value">~400亿</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">净利润</span>
+              <span class="metric-value">—</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">配额占比</span>
+              <span class="metric-value positive">60%+</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">行业地位</span>
+              <span class="metric-value">全球Top 1</span>
+            </div>
+          </div>
+          <div class="card-risk">
+            <span class="risk-label">⚠️ 风险</span>
+            <span class="risk-text">稀土价格下行周期中，人形机器人放量时间不确定，配额政策风险。</span>
+          </div>
+        </div>
+        <div class="stock-card deep-track" data-category="finance">
+          <div class="card-header">
+            <div class="stock-info">
+              <div class="stock-icon finance">同</div>
+              <div class="stock-name-group">
+                <div class="stock-name">同花顺</div>
+                <div class="stock-code">300033.SZ</div>
+              </div>
+            </div>
+            <span class="stock-tag deep">深度跟踪</span>
+          </div>
+          <div class="card-body">
+            <div class="stock-sector">金融AI</div>
+            <div class="stock-desc">金融AI业绩弹性最大，问财HithinkGPT金融垂类首个，毛利率85%，净利+76%同类最强。</div>
+          </div>
+          <div class="card-metrics">
+            <div class="metric">
+              <span class="metric-label">2025营收</span>
+              <span class="metric-value">60亿</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">净利润</span>
+              <span class="metric-value positive">+76%</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">毛利率</span>
+              <span class="metric-value">85%</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">行业地位</span>
+              <span class="metric-value">Top 1</span>
+            </div>
+          </div>
+          <div class="card-risk">
+            <span class="risk-label">⚠️ 风险</span>
+            <span class="risk-text">PE处历史高位，AI金融合规监管政策不确定，与东方财富赛道重叠。</span>
+          </div>
+        </div>
+        <div class="stock-card deep-track" data-category="packaging">
+          <div class="card-header">
+            <div class="stock-info">
+              <div class="stock-icon chip">通</div>
+              <div class="stock-name-group">
+                <div class="stock-name">通富微电</div>
+                <div class="stock-code">002156.SZ</div>
+              </div>
+            </div>
+            <span class="stock-tag deep">深度跟踪</span>
+          </div>
+          <div class="card-body">
+            <div class="stock-sector">先进封装</div>
+            <div class="stock-desc">AMD深度绑定(占其80%+)，AI芯片封装弹性大，净利+80%高速增长。</div>
+          </div>
+          <div class="card-metrics">
+            <div class="metric">
+              <span class="metric-label">2025营收</span>
+              <span class="metric-value">279亿</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">净利润</span>
+              <span class="metric-value positive">+80%</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">增速</span>
+              <span class="metric-value positive">+17%</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">全球地位</span>
+              <span class="metric-value">Top 4</span>
+            </div>
+          </div>
+          <div class="card-risk">
+            <span class="risk-label">⚠️ 风险</span>
+            <span class="risk-text">AMD AI出货节奏直接影响业绩，封装行业竞争加剧(长电/华天)，客户单一风险。</span>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Regular Coverage Pool -->
-    <div class="section-header" id="regular">
-      <div class="section-title">
-        <span class="section-badge regular">REGULAR</span>
-        <h2>常规覆盖池</h2>
-      </div>
-      <div class="section-count">12 家公司</div>
+    <div class="table-container" id="deep-table">
+      <table class="stock-table">
+        <thead>
+          <tr>
+            <th>公司</th>
+            <th>细分赛道</th>
+            <th>2025营收</th>
+            <th>净利润增速</th>
+            <th>核心指标</th>
+            <th>地位</th>
+            <th>层级</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <div class="stock-name-cell">
+                <div class="stock-icon server">工</div>
+                <div>
+                  <div class="stock-name">工业富联</div>
+                  <div class="stock-code">601138.SH</div>
+                </div>
+              </div>
+            </td>
+            <td>AI服务器代工</td>
+            <td class="metric-value">9,029亿</td>
+            <td><span class="metric-value positive">+52%</span></td>
+            <td>67%</td>
+            <td>Top 1</td>
+            <td><span class="stock-tag deep">深度</span></td>
+          </tr>
+          <tr>
+            <td>
+              <div class="stock-name-cell">
+                <div class="stock-icon optical">光</div>
+                <div>
+                  <div class="stock-name">中际旭创</div>
+                  <div class="stock-code">300308.SZ</div>
+                </div>
+              </div>
+            </td>
+            <td>光模块</td>
+            <td class="metric-value">382亿</td>
+            <td><span class="metric-value positive">+109%</span></td>
+            <td>42.6%</td>
+            <td>Top 1</td>
+            <td><span class="stock-tag deep">深度</span></td>
+          </tr>
+          <tr>
+            <td>
+              <div class="stock-name-cell">
+                <div class="stock-icon server">浪</div>
+                <div>
+                  <div class="stock-name">浪潮信息</div>
+                  <div class="stock-code">000977.SZ</div>
+                </div>
+              </div>
+            </td>
+            <td>AI服务器</td>
+            <td class="metric-value">1,648亿</td>
+            <td><span class="metric-value positive">+5%</span></td>
+            <td>>50%</td>
+            <td>Top 2</td>
+            <td><span class="stock-tag deep">深度</span></td>
+          </tr>
+          <tr>
+            <td>
+              <div class="stock-name-cell">
+                <div class="stock-icon optical">天</div>
+                <div>
+                  <div class="stock-name">天孚通信</div>
+                  <div class="stock-code">300394.SZ</div>
+                </div>
+              </div>
+            </td>
+            <td>光器件/光引擎</td>
+            <td class="metric-value">52亿</td>
+            <td><span class="metric-value positive">+50%</span></td>
+            <td>+81%</td>
+            <td>Top 1</td>
+            <td><span class="stock-tag deep">深度</span></td>
+          </tr>
+          <tr>
+            <td>
+              <div class="stock-name-cell">
+                <div class="stock-icon datacenter">润</div>
+                <div>
+                  <div class="stock-name">润泽科技</div>
+                  <div class="stock-code">300442.SZ</div>
+                </div>
+              </div>
+            </td>
+            <td>AIDC/智算中心</td>
+            <td class="metric-value">57亿</td>
+            <td><span class="metric-value positive">+182%</span></td>
+            <td>44%</td>
+            <td>Top 1</td>
+            <td><span class="stock-tag deep">深度</span></td>
+          </tr>
+          <tr>
+            <td>
+              <div class="stock-name-cell">
+                <div class="stock-icon cooling">英</div>
+                <div>
+                  <div class="stock-name">英维克</div>
+                  <div class="stock-code">002837.SZ</div>
+                </div>
+              </div>
+            </td>
+            <td>液冷温控</td>
+            <td class="metric-value">61亿</td>
+            <td><span class="metric-value">—</span></td>
+            <td>2亿+</td>
+            <td>Top 1</td>
+            <td><span class="stock-tag deep">深度</span></td>
+          </tr>
+          <tr>
+            <td>
+              <div class="stock-name-cell">
+                <div class="stock-icon office">金</div>
+                <div>
+                  <div class="stock-name">金山办公</div>
+                  <div class="stock-code">688111.SH</div>
+                </div>
+              </div>
+            </td>
+            <td>AI办公</td>
+            <td class="metric-value">59亿</td>
+            <td><span class="metric-value positive">+12%</span></td>
+            <td>+65%</td>
+            <td>Top 1</td>
+            <td><span class="stock-tag deep">深度</span></td>
+          </tr>
+          <tr>
+            <td>
+              <div class="stock-name-cell">
+                <div class="stock-icon chip">海</div>
+                <div>
+                  <div class="stock-name">海光信息</div>
+                  <div class="stock-code">688041.SH</div>
+                </div>
+              </div>
+            </td>
+            <td>CPU/DCU</td>
+            <td class="metric-value">144亿</td>
+            <td><span class="metric-value positive">+32%</span></td>
+            <td>+57%</td>
+            <td>Top 1</td>
+            <td><span class="stock-tag deep">深度</span></td>
+          </tr>
+          <tr>
+            <td>
+              <div class="stock-name-cell">
+                <div class="stock-icon chip">北</div>
+                <div>
+                  <div class="stock-name">北方华创</div>
+                  <div class="stock-code">002371.SZ</div>
+                </div>
+              </div>
+            </td>
+            <td>半导体设备平台</td>
+            <td class="metric-value">394亿</td>
+            <td><span class="metric-value positive">+31%</span></td>
+            <td>+31%</td>
+            <td>Top 1</td>
+            <td><span class="stock-tag deep">深度</span></td>
+          </tr>
+          <tr>
+            <td>
+              <div class="stock-name-cell">
+                <div class="stock-icon chip">微</div>
+                <div>
+                  <div class="stock-name">中微公司</div>
+                  <div class="stock-code">688012.SH</div>
+                </div>
+              </div>
+            </td>
+            <td>刻蚀设备</td>
+            <td class="metric-value">124亿</td>
+            <td><span class="metric-value positive">+30%</span></td>
+            <td>+37%</td>
+            <td>Top 1</td>
+            <td><span class="stock-tag deep">深度</span></td>
+          </tr>
+          <tr>
+            <td>
+              <div class="stock-name-cell">
+                <div class="stock-icon finance">东</div>
+                <div>
+                  <div class="stock-name">东方财富</div>
+                  <div class="stock-code">300059.SZ</div>
+                </div>
+              </div>
+            </td>
+            <td>金融AI</td>
+            <td class="metric-value">161亿</td>
+            <td><span class="metric-value">—</span></td>
+            <td>+38%</td>
+            <td>Top 1</td>
+            <td><span class="stock-tag deep">深度</span></td>
+          </tr>
+          <tr>
+            <td>
+              <div class="stock-name-cell">
+                <div class="stock-icon copper">洛</div>
+                <div>
+                  <div class="stock-name">洛阳钼业</div>
+                  <div class="stock-code">603993.SH</div>
+                </div>
+              </div>
+            </td>
+            <td>铜钴（算力金属）</td>
+            <td class="metric-value">~2000亿</td>
+            <td><span class="metric-value positive">+30%+</span></td>
+            <td>~55万吨</td>
+            <td>~10x</td>
+            <td><span class="stock-tag deep">深度</span></td>
+          </tr>
+          <tr>
+            <td>
+              <div class="stock-name-cell">
+                <div class="stock-icon rare_earth">稀</div>
+                <div>
+                  <div class="stock-name">北方稀土</div>
+                  <div class="stock-code">600010.SH</div>
+                </div>
+              </div>
+            </td>
+            <td>稀土永磁（算力金属）</td>
+            <td class="metric-value">~400亿</td>
+            <td><span class="metric-value">—</span></td>
+            <td>60%+</td>
+            <td>全球Top 1</td>
+            <td><span class="stock-tag deep">深度</span></td>
+          </tr>
+          <tr>
+            <td>
+              <div class="stock-name-cell">
+                <div class="stock-icon finance">同</div>
+                <div>
+                  <div class="stock-name">同花顺</div>
+                  <div class="stock-code">300033.SZ</div>
+                </div>
+              </div>
+            </td>
+            <td>金融AI</td>
+            <td class="metric-value">60亿</td>
+            <td><span class="metric-value positive">+76%</span></td>
+            <td>85%</td>
+            <td>Top 1</td>
+            <td><span class="stock-tag deep">深度</span></td>
+          </tr>
+          <tr>
+            <td>
+              <div class="stock-name-cell">
+                <div class="stock-icon chip">通</div>
+                <div>
+                  <div class="stock-name">通富微电</div>
+                  <div class="stock-code">002156.SZ</div>
+                </div>
+              </div>
+            </td>
+            <td>先进封装</td>
+            <td class="metric-value">279亿</td>
+            <td><span class="metric-value positive">+80%</span></td>
+            <td>+17%</td>
+            <td>Top 4</td>
+            <td><span class="stock-tag deep">深度</span></td>
+          </tr>
+        </tbody>
+      </table>
     </div>
 
-    <div class="grid-container active" id="regular-grid">
-      <div class="stock-grid">
+    <!-- Regular Track Pool -->
+    <div class="section-header" id="regular" style="margin-top: 64px;">
+      <div class="section-title">
+        <span class="section-badge regular">REGULAR COVER</span>
+        <h2>常规覆盖池</h2>
+      </div>
+      <div class="section-count">13 家公司</div>
+    </div>
+
+    <div class="stock-grid" id="regular-grid">
         <div class="stock-card regular-track" data-category="foundry">
           <div class="card-header">
             <div class="stock-info">
-              <div class="stock-icon foundry">中</div>
+              <div class="stock-icon chip">中</div>
               <div class="stock-name-group">
                 <div class="stock-name">中芯国际</div>
                 <div class="stock-code">688981.SH</div>
@@ -616,35 +1543,35 @@
           </div>
           <div class="card-body">
             <div class="stock-sector">晶圆代工</div>
-            <div class="stock-desc">国内晶圆代工第一，战略不可替代，受益AI芯片需求和国产替代。</div>
+            <div class="stock-desc">全球第三、国内第一晶圆代工，战略不可替代，但业绩增速放缓至个位数。</div>
           </div>
           <div class="card-metrics">
             <div class="metric">
               <span class="metric-label">2025营收</span>
-              <span class="metric-value">589亿</span>
+              <span class="metric-value">673亿</span>
             </div>
             <div class="metric">
               <span class="metric-label">净利润</span>
-              <span class="metric-value positive">+32%</span>
+              <span class="metric-value positive">+36%</span>
             </div>
             <div class="metric">
-              <span class="metric-label">制程</span>
-              <span class="metric-value">N+2量产</span>
+              <span class="metric-label">增速</span>
+              <span class="metric-value positive">+16.5%</span>
             </div>
             <div class="metric">
-              <span class="metric-label">国内地位</span>
-              <span class="metric-value">绝对第一</span>
+              <span class="metric-label">全球地位</span>
+              <span class="metric-value">Top 3</span>
             </div>
           </div>
           <div class="card-risk">
             <span class="risk-label">⚠️ 风险</span>
-            <span class="risk-text">先进制程受美国限制，与台积电差距大，资本开支巨大。</span>
+            <span class="risk-text">制裁限制先进制程扩产，成熟制程竞争加剧(产能过剩风险)。</span>
           </div>
         </div>
         <div class="stock-card regular-track" data-category="equipment">
           <div class="card-header">
             <div class="stock-info">
-              <div class="stock-icon equipment">拓</div>
+              <div class="stock-icon chip">拓</div>
               <div class="stock-name-group">
                 <div class="stock-name">拓荆科技</div>
                 <div class="stock-code">688072.SH</div>
@@ -653,36 +1580,36 @@
             <span class="stock-tag regular">常规覆盖</span>
           </div>
           <div class="card-body">
-            <div class="stock-sector">薄膜沉积</div>
-            <div class="stock-desc">薄膜沉积设备领军，PVD/CVD/ALD全布局受益国产替代。</div>
+            <div class="stock-sector">薄膜沉积设备</div>
+            <div class="stock-desc">薄膜沉积领军，PECVD创历史新高，1-2年后有望升深度池。</div>
           </div>
           <div class="card-metrics">
             <div class="metric">
               <span class="metric-label">2025营收</span>
-              <span class="metric-value">38亿</span>
+              <span class="metric-value">65亿</span>
             </div>
             <div class="metric">
               <span class="metric-label">净利润</span>
-              <span class="metric-value positive">+72%</span>
+              <span class="metric-value positive">+35%</span>
             </div>
             <div class="metric">
-              <span class="metric-label">薄膜沉积</span>
-              <span class="metric-value">领军</span>
+              <span class="metric-label">增速</span>
+              <span class="metric-value positive">+59%</span>
             </div>
             <div class="metric">
-              <span class="metric-label">国产替代</span>
-              <span class="metric-value">确定性强</span>
+              <span class="metric-label">行业地位</span>
+              <span class="metric-value">Top 1</span>
             </div>
           </div>
           <div class="card-risk">
             <span class="risk-label">⚠️ 风险</span>
-            <span class="risk-text">PE 103x偏高，研发投入大，客户集中。</span>
+            <span class="risk-text">估值偏高(PS>20)，客户集中度高(依赖少数晶圆厂扩产节奏)。</span>
           </div>
         </div>
         <div class="stock-card regular-track" data-category="packaging">
           <div class="card-header">
             <div class="stock-info">
-              <div class="stock-icon packaging">长</div>
+              <div class="stock-icon chip">长</div>
               <div class="stock-name-group">
                 <div class="stock-name">长电科技</div>
                 <div class="stock-code">600584.SH</div>
@@ -692,73 +1619,35 @@
           </div>
           <div class="card-body">
             <div class="stock-sector">先进封装</div>
-            <div class="stock-desc">国内封装龙头，AI先进封装弹性大，Chiplet技术领先。</div>
+            <div class="stock-desc">全球封测龙头，先进封装收入270亿创历史新高，PE<30估值洼地。</div>
           </div>
           <div class="card-metrics">
             <div class="metric">
               <span class="metric-label">2025营收</span>
-              <span class="metric-value">385亿</span>
+              <span class="metric-value">389亿</span>
             </div>
             <div class="metric">
               <span class="metric-label">净利润</span>
-              <span class="metric-value positive">+42%</span>
+              <span class="metric-value negative">-3%</span>
             </div>
             <div class="metric">
               <span class="metric-label">先进封装</span>
-              <span class="metric-value">国内第一</span>
+              <span class="metric-value">270亿</span>
             </div>
             <div class="metric">
-              <span class="metric-label">Chiplet</span>
-              <span class="metric-value">领先</span>
+              <span class="metric-label">全球地位</span>
+              <span class="metric-value">Top 3</span>
             </div>
           </div>
           <div class="card-risk">
             <span class="risk-label">⚠️ 风险</span>
-            <span class="risk-text">封装行业毛利率低(<20%)，传统封装占比仍大，竞争激烈。</span>
-          </div>
-        </div>
-        <div class="stock-card regular-track" data-category="packaging">
-          <div class="card-header">
-            <div class="stock-info">
-              <div class="stock-icon packaging">通</div>
-              <div class="stock-name-group">
-                <div class="stock-name">通富微电</div>
-                <div class="stock-code">002156.SZ</div>
-              </div>
-            </div>
-            <span class="stock-tag regular">常规覆盖</span>
-          </div>
-          <div class="card-body">
-            <div class="stock-sector">先进封装</div>
-            <div class="stock-desc">AMD封装核心伙伴，深度绑定AI芯片先进封装需求。</div>
-          </div>
-          <div class="card-metrics">
-            <div class="metric">
-              <span class="metric-label">2025营收</span>
-              <span class="metric-value">268亿</span>
-            </div>
-            <div class="metric">
-              <span class="metric-label">净利润</span>
-              <span class="metric-value positive">+80%</span>
-            </div>
-            <div class="metric">
-              <span class="metric-label">AMD</span>
-              <span class="metric-value">>50%收入</span>
-            </div>
-            <div class="metric">
-              <span class="metric-label">先进封装</span>
-              <span class="metric-value">弹性大</span>
-            </div>
-          </div>
-          <div class="card-risk">
-            <span class="risk-label">⚠️ 风险</span>
-            <span class="risk-text">过度依赖AMD单一客户，封装毛利率偏低。</span>
+            <span class="risk-text">净利润增速-3%下滑，传统封装拖累，先进封装占比仍需提升。</span>
           </div>
         </div>
         <div class="stock-card regular-track" data-category="optical">
           <div class="card-header">
             <div class="stock-info">
-              <div class="stock-icon optical">迅</div>
+              <div class="stock-icon optical">光</div>
               <div class="stock-name-group">
                 <div class="stock-name">光迅科技</div>
                 <div class="stock-code">002281.SZ</div>
@@ -767,30 +1656,30 @@
             <span class="stock-tag regular">常规覆盖</span>
           </div>
           <div class="card-body">
-            <div class="stock-sector">光模块</div>
-            <div class="stock-desc">产业链配套核心，光芯片/光模块一体化布局。</div>
+            <div class="stock-sector">光模块国产替代</div>
+            <div class="stock-desc">光通信产业链核心配套，数通业务高速，AI弹性温和，央企背景。</div>
           </div>
           <div class="card-metrics">
             <div class="metric">
               <span class="metric-label">2025营收</span>
-              <span class="metric-value">86亿</span>
+              <span class="metric-value">119亿</span>
             </div>
             <div class="metric">
               <span class="metric-label">净利润</span>
-              <span class="metric-value positive">+35%</span>
+              <span class="metric-value positive">+43%</span>
             </div>
             <div class="metric">
-              <span class="metric-label">光芯片</span>
-              <span class="metric-value">自研</span>
+              <span class="metric-label">行业地位</span>
+              <span class="metric-value">Top 3</span>
             </div>
             <div class="metric">
-              <span class="metric-label">产业链</span>
-              <span class="metric-value">一体化</span>
+              <span class="metric-label">—</span>
+              <span class="metric-value">—</span>
             </div>
           </div>
           <div class="card-risk">
             <span class="risk-label">⚠️ 风险</span>
-            <span class="risk-text">光模块行业竞争激烈，高端光芯片落后海外。</span>
+            <span class="risk-text">AI弹性温和(非核心受益)，数通与电信双市场周期错位。</span>
           </div>
         </div>
         <div class="stock-card regular-track" data-category="server">
@@ -805,36 +1694,74 @@
             <span class="stock-tag regular">常规覆盖</span>
           </div>
           <div class="card-body">
-            <div class="stock-sector">算力全栈</div>
-            <div class="stock-desc">超算第一，国产算力全栈布局(硬件+软件+云)。</div>
+            <div class="stock-sector">国产算力全栈</div>
+            <div class="stock-desc">超算国内连续12年第一，国产算力底座，制裁风险压制弹性。</div>
           </div>
           <div class="card-metrics">
             <div class="metric">
               <span class="metric-label">2025营收</span>
-              <span class="metric-value">198亿</span>
+              <span class="metric-value">159亿</span>
             </div>
             <div class="metric">
               <span class="metric-label">净利润</span>
-              <span class="metric-value positive">+28%</span>
+              <span class="metric-value positive">+14%</span>
             </div>
             <div class="metric">
-              <span class="metric-label">超算</span>
-              <span class="metric-value">国内第一</span>
+              <span class="metric-label">IT设备占比</span>
+              <span class="metric-value">83%</span>
             </div>
             <div class="metric">
-              <span class="metric-label">算力全栈</span>
-              <span class="metric-value">布局</span>
+              <span class="metric-label">行业地位</span>
+              <span class="metric-value">Top 1</span>
             </div>
           </div>
           <div class="card-risk">
             <span class="risk-label">⚠️ 风险</span>
-            <span class="risk-text">美国制裁风险(实体清单)，增长放缓。</span>
+            <span class="risk-text">制裁风险压制估值弹性，国产算力替代进度有不确定性。</span>
+          </div>
+        </div>
+        <div class="stock-card regular-track" data-category="finance">
+          <div class="card-header">
+            <div class="stock-info">
+              <div class="stock-icon finance">恒</div>
+              <div class="stock-name-group">
+                <div class="stock-name">恒生电子</div>
+                <div class="stock-code">600570.SH</div>
+              </div>
+            </div>
+            <span class="stock-tag regular">常规覆盖</span>
+          </div>
+          <div class="card-body">
+            <div class="stock-sector">金融科技/AI</div>
+            <div class="stock-desc">金融IT系统龙头，LightGPT大模型，AI赋能金融IT增量尚在验证。</div>
+          </div>
+          <div class="card-metrics">
+            <div class="metric">
+              <span class="metric-label">2025营收</span>
+              <span class="metric-value">58亿</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">净利润</span>
+              <span class="metric-value positive">+18%</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">营收增速</span>
+              <span class="metric-value negative">-12%</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">行业地位</span>
+              <span class="metric-value">Top 1</span>
+            </div>
+          </div>
+          <div class="card-risk">
+            <span class="risk-label">⚠️ 风险</span>
+            <span class="risk-text">营收增速-12%下滑，金融IT投入放缓，AI金融合规监管风险。</span>
           </div>
         </div>
         <div class="stock-card regular-track" data-category="material">
           <div class="card-header">
             <div class="stock-info">
-              <div class="stock-icon material">安</div>
+              <div class="stock-icon chip">安</div>
               <div class="stock-name-group">
                 <div class="stock-name">安集科技</div>
                 <div class="stock-code">688019.SH</div>
@@ -844,67 +1771,219 @@
           </div>
           <div class="card-body">
             <div class="stock-sector">CMP抛光液</div>
-            <div class="stock-desc">CMP抛光液国产龙头，国产替代确定性强。</div>
+            <div class="stock-desc">CMP抛光液国产龙头，全球市占率13%持续提升，业绩30%+高增长确定。</div>
           </div>
           <div class="card-metrics">
             <div class="metric">
               <span class="metric-label">2025营收</span>
-              <span class="metric-value">22亿</span>
+              <span class="metric-value">25亿</span>
             </div>
             <div class="metric">
               <span class="metric-label">净利润</span>
-              <span class="metric-value positive">+45%</span>
+              <span class="metric-value">—</span>
             </div>
             <div class="metric">
-              <span class="metric-label">CMP抛光液</span>
-              <span class="metric-value">国内第一</span>
+              <span class="metric-label">增速</span>
+              <span class="metric-value positive">+37%</span>
             </div>
             <div class="metric">
-              <span class="metric-label">国产替代</span>
-              <span class="metric-value">确定性强</span>
+              <span class="metric-label">全球市占</span>
+              <span class="metric-value">13%</span>
             </div>
           </div>
           <div class="card-risk">
             <span class="risk-label">⚠️ 风险</span>
-            <span class="risk-text">市场规模有限(~100亿)，产品线单一。</span>
+            <span class="risk-text">市值偏小(~200亿)，单一品类天花板有限，客户集中度高。</span>
           </div>
         </div>
-        <div class="stock-card regular-track" data-category="finance">
+        <div class="stock-card regular-track" data-category="model">
           <div class="card-header">
             <div class="stock-info">
-              <div class="stock-icon finance">同</div>
+              <div class="stock-icon model">讯</div>
               <div class="stock-name-group">
-                <div class="stock-name">同花顺</div>
-                <div class="stock-code">300033.SZ</div>
+                <div class="stock-name">科大讯飞</div>
+                <div class="stock-code">002230.SZ</div>
               </div>
             </div>
             <span class="stock-tag regular">常规覆盖</span>
           </div>
           <div class="card-body">
-            <div class="stock-sector">金融AI</div>
-            <div class="stock-desc">金融AI龙头，毛利率85%，AI投研/投顾变现空间大。</div>
+            <div class="stock-sector">大模型/语音AI</div>
+            <div class="stock-desc">大模型商业化标杆，星火大模型生态领先，但商业模式验证期长。</div>
           </div>
           <div class="card-metrics">
             <div class="metric">
               <span class="metric-label">2025营收</span>
-              <span class="metric-value">56亿</span>
+              <span class="metric-value">271亿</span>
             </div>
             <div class="metric">
               <span class="metric-label">净利润</span>
-              <span class="metric-value positive">+18%</span>
+              <span class="metric-value positive">+50%</span>
             </div>
             <div class="metric">
-              <span class="metric-label">毛利率</span>
-              <span class="metric-value negative">85%</span>
+              <span class="metric-label">大模型中标</span>
+              <span class="metric-value">91项</span>
             </div>
             <div class="metric">
-              <span class="metric-label">AI投顾</span>
-              <span class="metric-value">落地中</span>
+              <span class="metric-label">行业地位</span>
+              <span class="metric-value">Top 1</span>
             </div>
           </div>
           <div class="card-risk">
             <span class="risk-label">⚠️ 风险</span>
-            <span class="risk-text">PE 177x极高估，C端付费增长放缓，监管趋严。</span>
+            <span class="risk-text">AI变现效率待验证，政企项目回款周期长，大模型竞争白热化。</span>
+          </div>
+        </div>
+        <div class="stock-card regular-track" data-category="auto">
+          <div class="card-header">
+            <div class="stock-info">
+              <div class="stock-icon auto">德</div>
+              <div class="stock-name-group">
+                <div class="stock-name">德赛西威</div>
+                <div class="stock-code">002920.SZ</div>
+              </div>
+            </div>
+            <span class="stock-tag regular">常规覆盖</span>
+          </div>
+          <div class="card-body">
+            <div class="stock-sector">智能驾驶</div>
+            <div class="stock-desc">智能驾驶商业化最确定Tier1，绑定理想/吉利，增速放缓至22%维持常规观察。</div>
+          </div>
+          <div class="card-metrics">
+            <div class="metric">
+              <span class="metric-label">2025营收</span>
+              <span class="metric-value">326亿</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">净利润</span>
+              <span class="metric-value positive">+22%</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">智驾增速</span>
+              <span class="metric-value positive">+63%</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">行业地位</span>
+              <span class="metric-value">Top 1</span>
+            </div>
+          </div>
+          <div class="card-risk">
+            <span class="risk-label">⚠️ 风险</span>
+            <span class="risk-text">汽车业务增速放缓至22%，智驾竞争白热化，价格战压缩利润空间。</span>
+          </div>
+        </div>
+        <div class="stock-card regular-track" data-category="auto">
+          <div class="card-header">
+            <div class="stock-info">
+              <div class="stock-icon auto">创</div>
+              <div class="stock-name-group">
+                <div class="stock-name">中科创达</div>
+                <div class="stock-code">300496.SZ</div>
+              </div>
+            </div>
+            <span class="stock-tag regular">常规覆盖</span>
+          </div>
+          <div class="card-body">
+            <div class="stock-sector">智能汽车OS+AIoT</div>
+            <div class="stock-desc">智能汽车OS龙头，AIoT增速133%，但汽车增速放缓至10%，关注端侧AI驱动。</div>
+          </div>
+          <div class="card-metrics">
+            <div class="metric">
+              <span class="metric-label">2025营收</span>
+              <span class="metric-value">78亿</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">净利润</span>
+              <span class="metric-value positive">+10%</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">AIoT增速</span>
+              <span class="metric-value positive">+133%</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">行业地位</span>
+              <span class="metric-value">Top 1</span>
+            </div>
+          </div>
+          <div class="card-risk">
+            <span class="risk-label">⚠️ 风险</span>
+            <span class="risk-text">汽车业务增速放缓至10%，端侧AI放量节奏不确定。</span>
+          </div>
+        </div>
+        <div class="stock-card regular-track" data-category="equipment">
+          <div class="card-header">
+            <div class="stock-info">
+              <div class="stock-icon chip">华</div>
+              <div class="stock-name-group">
+                <div class="stock-name">华海清科</div>
+                <div class="stock-code">688120.SH</div>
+              </div>
+            </div>
+            <span class="stock-tag regular">常规覆盖</span>
+          </div>
+          <div class="card-body">
+            <div class="stock-sector">CMP设备</div>
+            <div class="stock-desc">CMP设备国产绝对龙头，12英寸全面覆盖国内先进产线，国产替代核心设备商。</div>
+          </div>
+          <div class="card-metrics">
+            <div class="metric">
+              <span class="metric-label">2025营收</span>
+              <span class="metric-value">—</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">净利润</span>
+              <span class="metric-value">—</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">行业地位</span>
+              <span class="metric-value">Top 1</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">国产替代</span>
+              <span class="metric-value">核心</span>
+            </div>
+          </div>
+          <div class="card-risk">
+            <span class="risk-label">⚠️ 风险</span>
+            <span class="risk-text">CMP单一品类天花板有限，最新财务数据缺失(—)，跟踪难度大。</span>
+          </div>
+        </div>
+        <div class="stock-card regular-track" data-category="optical">
+          <div class="card-header">
+            <div class="stock-info">
+              <div class="stock-icon optical">新</div>
+              <div class="stock-name-group">
+                <div class="stock-name">新易盛</div>
+                <div class="stock-code">300502.SZ</div>
+              </div>
+            </div>
+            <span class="stock-tag regular">常规覆盖</span>
+          </div>
+          <div class="card-body">
+            <div class="stock-sector">光模块</div>
+            <div class="stock-desc">营收248亿(+187%)，净利95亿(+236%)，LPO全球首个规模量产，光模块第二极。</div>
+          </div>
+          <div class="card-metrics">
+            <div class="metric">
+              <span class="metric-label">2025营收</span>
+              <span class="metric-value">248亿</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">净利润</span>
+              <span class="metric-value positive">+236%</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">增速</span>
+              <span class="metric-value positive">+187%</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">全球地位</span>
+              <span class="metric-value">Top 3</span>
+            </div>
+          </div>
+          <div class="card-risk">
+            <span class="risk-label">⚠️ 风险</span>
+            <span class="risk-text">光模块强周期属性，与中际旭创赛道重叠(池内已有3只光通信)，2026年1.6T需求不确定。</span>
           </div>
         </div>
         <div class="stock-card regular-track" data-category="tungsten">
@@ -919,30 +1998,30 @@
             <span class="stock-tag regular">常规覆盖</span>
           </div>
           <div class="card-body">
-            <div class="stock-sector">算力金属-钨</div>
-            <div class="stock-desc">钨行业龙头，光伏钨丝+半导体靶材双增量，PE 30x历史低位。</div>
+            <div class="stock-sector">钨+靶材（算力金属）</div>
+            <div class="stock-desc">钨产业链一体化龙头，光伏钨丝切割线渗透率提升，半导体靶材受益AI芯片，PE~20x历史低位。</div>
           </div>
           <div class="card-metrics">
             <div class="metric">
               <span class="metric-label">2025营收</span>
-              <span class="metric-value">589亿</span>
+              <span class="metric-value">~500亿</span>
             </div>
             <div class="metric">
               <span class="metric-label">净利润</span>
-              <span class="metric-value positive">+22%</span>
+              <span class="metric-value positive">+10-20%</span>
             </div>
             <div class="metric">
-              <span class="metric-label">钨丝</span>
-              <span class="metric-value">光伏增量</span>
+              <span class="metric-label">钨市占率</span>
+              <span class="metric-value">全球~30%</span>
             </div>
             <div class="metric">
               <span class="metric-label">PE</span>
-              <span class="metric-value positive">~30x</span>
+              <span class="metric-value">~20-25x</span>
             </div>
           </div>
           <div class="card-risk">
             <span class="risk-label">⚠️ 风险</span>
-            <span class="risk-text">钨价周期波动，光伏钨丝渗透率提升节奏不确定。</span>
+            <span class="risk-text">钨价周期波动，光伏钨丝渗透率增速放缓，靶材业务体量尚小。</span>
           </div>
         </div>
         <div class="stock-card regular-track" data-category="material">
@@ -958,67 +2037,79 @@
           </div>
           <div class="card-body">
             <div class="stock-sector">超高纯PFA+氟化工</div>
-            <div class="stock-desc">国内唯一量产半导体级PFA，氟化工绝对龙头。</div>
+            <div class="stock-desc">国内唯一量产超高纯半导体级PFA企业，PFA是半导体湿法设备不可替代耗材(金属离子<10ppb，≤10nm制程)，已通过国内外设备商认证。配额制下制冷剂高景气周期，现金流优秀。</div>
           </div>
           <div class="card-metrics">
             <div class="metric">
               <span class="metric-label">PFA产能</span>
-              <span class="metric-value">5,000吨</span>
+              <span class="metric-value">5000吨</span>
             </div>
             <div class="metric">
-              <span class="metric-label">PFA扩产</span>
-              <span class="metric-value">+3,000吨</span>
+              <span class="metric-label">扩产规划</span>
+              <span class="metric-value positive">+3000吨</span>
             </div>
             <div class="metric">
-              <span class="metric-label">PE</span>
-              <span class="metric-value positive">~33x</span>
+              <span class="metric-label">PE(TTM)</span>
+              <span class="metric-value">33x</span>
             </div>
             <div class="metric">
-              <span class="metric-label">PFA占比</span>
-              <span class="metric-value">~4%</span>
+              <span class="metric-label">半导体级PFA</span>
+              <span class="metric-value">国内唯一</span>
             </div>
           </div>
           <div class="card-risk">
             <span class="risk-label">⚠️ 风险</span>
-            <span class="risk-text">PFA占比较低(~4%)，氟化工周期波动，产能爬坡需时间。</span>
+            <span class="risk-text">PFA收入占比仍低(~4%)，制冷剂周期2026年见顶风险，PE33x短期偏高，已从34涨至50.8(+48%)追高风险。</span>
           </div>
         </div>
-        <div class="stock-card regular-track" data-category="cooling">
+    </div>
+
+    <!-- Observation Pool -->
+    <div class="section-header" id="observe" style="margin-top: 64px;">
+      <div class="section-title">
+        <span class="section-badge" style="background: rgba(245,158,11,0.1); color: #f59e0b; border-color: rgba(245,158,11,0.3);">WATCH LIST</span>
+        <h2 style="color: #f59e0b;">观察池</h2>
+      </div>
+      <div class="section-count">5 家公司（待条件满足后重新评估）</div>
+    </div>
+
+    <div class="stock-grid" id="observe-grid">
+        <div class="stock-card regular-track" data-category="chip">
           <div class="card-header">
             <div class="stock-info">
-              <div class="stock-icon cooling">英</div>
+              <div class="stock-icon chip">寒</div>
               <div class="stock-name-group">
-                <div class="stock-name">英维克</div>
-                <div class="stock-code">002837.SZ</div>
+                <div class="stock-name">寒武纪</div>
+                <div class="stock-code">688256.SH</div>
               </div>
             </div>
-            <span class="stock-tag regular">常规覆盖</span>
+            <span class="stock-tag regular">观察中</span>
           </div>
           <div class="card-body">
-            <div class="stock-sector">液冷温控</div>
-            <div class="stock-desc">液冷产业龙头，液冷从可选变刚需，绑定华为/百度。</div>
+            <div class="stock-sector">AI芯片设计</div>
+            <div class="stock-desc">国产AI芯片龙头，但连续亏损5年，不满足基础准入盈利要求，待扭亏后重新评估。</div>
           </div>
           <div class="card-metrics">
             <div class="metric">
               <span class="metric-label">2025营收</span>
-              <span class="metric-value">68亿</span>
+              <span class="metric-value">65亿</span>
             </div>
             <div class="metric">
               <span class="metric-label">净利润</span>
-              <span class="metric-value positive">+55%</span>
+              <span class="metric-value">扭亏</span>
             </div>
             <div class="metric">
-              <span class="metric-label">液冷</span>
-              <span class="metric-value">绝对龙头</span>
+              <span class="metric-label">AI占比</span>
+              <span class="metric-value">99.7%</span>
             </div>
             <div class="metric">
-              <span class="metric-label">绑定客户</span>
-              <span class="metric-value">华为/百度</span>
+              <span class="metric-label">—</span>
+              <span class="metric-value">—</span>
             </div>
           </div>
           <div class="card-risk">
             <span class="risk-label">⚠️ 风险</span>
-            <span class="risk-text">PE 3,038x极高估，PB 31.89，液冷渗透率提升节奏不确定。</span>
+            <span class="risk-text">连续亏损5年，营收体量小(65亿)，估值极高。</span>
           </div>
         </div>
         <div class="stock-card regular-track" data-category="cooling">
@@ -1030,217 +2121,470 @@
                 <div class="stock-code">301018.SZ</div>
               </div>
             </div>
-            <span class="stock-tag regular">常规覆盖</span>
+            <span class="stock-tag regular">观察中</span>
           </div>
           <div class="card-body">
-            <div class="stock-sector">液冷温控</div>
-            <div class="stock-desc">液冷赛道受益者，数据中心温控+储能温控双轮驱动。</div>
+            <div class="stock-sector">液冷</div>
+            <div class="stock-desc">液冷赛道有成长性，但市值<100亿严重不达标，利润波动大，待体量放大后重新评估。</div>
           </div>
           <div class="card-metrics">
             <div class="metric">
               <span class="metric-label">2025营收</span>
-              <span class="metric-value">32亿</span>
+              <span class="metric-value">42亿</span>
             </div>
             <div class="metric">
               <span class="metric-label">净利润</span>
-              <span class="metric-value positive">+48%</span>
+              <span class="metric-value positive">+88%</span>
             </div>
             <div class="metric">
-              <span class="metric-label">数据中心</span>
-              <span class="metric-value">华为合作</span>
+              <span class="metric-label">液冷增速</span>
+              <span class="metric-value">2.9x</span>
             </div>
             <div class="metric">
-              <span class="metric-label">储能</span>
-              <span class="metric-value">第二曲线</span>
+              <span class="metric-label">—</span>
+              <span class="metric-value">—</span>
             </div>
           </div>
           <div class="card-risk">
             <span class="risk-label">⚠️ 风险</span>
-            <span class="risk-text">市值405亿(<500亿)，液冷行业竞争加剧，PE 357x极高。</span>
+            <span class="risk-text">市值<100亿远低于门槛，利润波动大。</span>
           </div>
         </div>
-      </div>
+        <div class="stock-card regular-track" data-category="cooling">
+          <div class="card-header">
+            <div class="stock-info">
+              <div class="stock-icon cooling">高</div>
+              <div class="stock-name-group">
+                <div class="stock-name">高澜股份</div>
+                <div class="stock-code">300499.SZ</div>
+              </div>
+            </div>
+            <span class="stock-tag regular">观察中</span>
+          </div>
+          <div class="card-body">
+            <div class="stock-sector">液冷</div>
+            <div class="stock-desc">液冷毛利率50%+，但市值<100亿远低于门槛，利润体量小，观察后市。</div>
+          </div>
+          <div class="card-metrics">
+            <div class="metric">
+              <span class="metric-label">2025营收</span>
+              <span class="metric-value">~10亿</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">净利润</span>
+              <span class="metric-value">—</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">液冷毛利</span>
+              <span class="metric-value positive">50%+</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">—</span>
+              <span class="metric-value">—</span>
+            </div>
+          </div>
+          <div class="card-risk">
+            <span class="risk-label">⚠️ 风险</span>
+            <span class="risk-text">市值<100亿，利润体量小(~10亿营收)，流动性不足。</span>
+          </div>
+        </div>
+        <div class="stock-card regular-track" data-category="robot">
+          <div class="card-header">
+            <div class="stock-info">
+              <div class="stock-icon robot">科</div>
+              <div class="stock-name-group">
+                <div class="stock-name">科沃斯</div>
+                <div class="stock-code">603486.SH</div>
+              </div>
+            </div>
+            <span class="stock-tag regular">观察中</span>
+          </div>
+          <div class="card-body">
+            <div class="stock-sector">服务机器人</div>
+            <div class="stock-desc">行业竞争格局恶化，追觅/石头挤压市场份额，利润连续下滑，待格局企稳。</div>
+          </div>
+          <div class="card-metrics">
+            <div class="metric">
+              <span class="metric-label">2025营收</span>
+              <span class="metric-value">165亿</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">净利润</span>
+              <span class="metric-value positive">+7%</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">行业地位</span>
+              <span class="metric-value">Top 2</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">—</span>
+              <span class="metric-value">—</span>
+            </div>
+          </div>
+          <div class="card-risk">
+            <span class="risk-label">⚠️ 风险</span>
+            <span class="risk-text">竞争格局恶化(追觅/石头挤压)，利润连续下滑趋势未扭转。</span>
+          </div>
+        </div>
+        <div class="stock-card regular-track" data-category="datacenter">
+          <div class="card-header">
+            <div class="stock-info">
+              <div class="stock-icon datacenter">贝</div>
+              <div class="stock-name-group">
+                <div class="stock-name">中贝通信</div>
+                <div class="stock-code">603220.SH</div>
+              </div>
+            </div>
+            <span class="stock-tag regular">观察中</span>
+          </div>
+          <div class="card-body">
+            <div class="stock-sector">算力租赁</div>
+            <div class="stock-desc">算力租赁赛道热门，但市值<200亿，重资产模式现金流承压，观察规模扩张节奏。</div>
+          </div>
+          <div class="card-metrics">
+            <div class="metric">
+              <span class="metric-label">2025营收</span>
+              <span class="metric-value">—</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">智算增速</span>
+              <span class="metric-value positive">+130%</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">算力规模</span>
+              <span class="metric-value">22KP</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">—</span>
+              <span class="metric-value">—</span>
+            </div>
+          </div>
+          <div class="card-risk">
+            <span class="risk-label">⚠️ 风险</span>
+            <span class="risk-text">市值<200亿，重资产模式现金流承压，行业竞争加剧。</span>
+          </div>
+        </div>
     </div>
 
-    <!-- Observation Pool -->
-    <div class="section-header" id="observe">
-      <div class="section-title">
-        <span class="section-badge observe">WATCH</span>
-        <h2>观察池</h2>
-      </div>
-      <div class="section-count">7 家公司</div>
-    </div>
-    <p class="pool-subtitle" style="margin: -8px 0 16px;font-size:13px;color:var(--text-muted)">待条件满足后评估升降级</p>
-
-    <div class="grid-container active" id="observe-grid">
-      <div class="stock-grid" style="grid-template-columns:repeat(auto-fill,minmax(280px,1fr))">
-        <div class="stock-card observe-track" data-category="observe">
-          <div class="card-header">
-            <div class="stock-info">
-              <div class="stock-name">寒武纪</div>
-              <div class="stock-code">688256.SH</div>
-            </div>
-            <span class="stock-tag observe">观察池</span>
-          </div>
-          <div class="card-body">
-            <div class="stock-desc" style="font-size:13px;color:var(--text-secondary)">持续亏损，市值已9,160亿极高，期待扭亏。AI芯片赛道仍在但竞争激烈。</div>
-          </div>
-        </div>
-        <div class="stock-card observe-track" data-category="observe">
-          <div class="card-header">
-            <div class="stock-info">
-              <div class="stock-name">北方稀土</div>
-              <div class="stock-code">600010.SH</div>
-            </div>
-            <span class="stock-tag observe">观察池</span>
-          </div>
-          <div class="card-body">
-            <div class="stock-desc" style="font-size:13px;color:var(--text-secondary)">亏损中(PE-54)，稀土赛道仍在但短期业绩承压，待扭亏后评估。</div>
-          </div>
-        </div>
-        <div class="stock-card observe-track" data-category="observe">
-          <div class="card-header">
-            <div class="stock-info">
-              <div class="stock-name">恒生电子</div>
-              <div class="stock-code">600570.SH</div>
-            </div>
-            <span class="stock-tag observe">观察池</span>
-          </div>
-          <div class="card-body">
-            <div class="stock-desc" style="font-size:13px;color:var(--text-secondary)">市值397亿<500亿优先区间，金融IT龙头地位稳固。</div>
-          </div>
-        </div>
-        <div class="stock-card observe-track" data-category="observe">
-          <div class="card-header">
-            <div class="stock-info">
-              <div class="stock-name">科大讯飞</div>
-              <div class="stock-code">002230.SZ</div>
-            </div>
-            <span class="stock-tag observe">观察池</span>
-          </div>
-          <div class="card-body">
-            <div class="stock-desc" style="font-size:13px;color:var(--text-secondary)">PE-138亏损，大模型竞争加剧(DS/通义等)，待业绩改善评估。</div>
-          </div>
-        </div>
-        <div class="stock-card observe-track" data-category="observe">
-          <div class="card-header">
-            <div class="stock-info">
-              <div class="stock-name">德赛西威</div>
-              <div class="stock-code">002920.SZ</div>
-            </div>
-            <span class="stock-tag observe">观察池</span>
-          </div>
-          <div class="card-body">
-            <div class="stock-desc" style="font-size:13px;color:var(--text-secondary)">市值471亿<500亿优先区间，智驾Tier1赛道好。</div>
-          </div>
-        </div>
-        <div class="stock-card observe-track" data-category="observe">
-          <div class="card-header">
-            <div class="stock-info">
-              <div class="stock-name">中科创达</div>
-              <div class="stock-code">300496.SZ</div>
-            </div>
-            <span class="stock-tag observe">观察池</span>
-          </div>
-          <div class="card-body">
-            <div class="stock-desc" style="font-size:13px;color:var(--text-secondary)">市值273亿<500亿+增长放缓，端侧AI落地需观察。</div>
-          </div>
-        </div>
-        <div class="stock-card observe-track" data-category="observe">
-          <div class="card-header">
-            <div class="stock-info">
-              <div class="stock-name">科沃斯</div>
-              <div class="stock-code">603486.SH</div>
-            </div>
-            <span class="stock-tag observe">观察池</span>
-          </div>
-          <div class="card-body">
-            <div class="stock-desc" style="font-size:13px;color:var(--text-secondary)">竞争格局恶化(添可/追觅)，扫地机器人市场增速放缓。</div>
-          </div>
-        </div>
-
-      </div>
-    </div>
-
-    <!-- Filtering Rules -->
+    <!-- Screening Rules -->
     <div class="section-header" id="rules" style="margin-top: 64px;">
       <div class="section-title">
-        <span class="section-badge deep">RULES</span>
+        <span class="section-badge" style="background: rgba(94,106,210,0.1); color: var(--accent-violet); border-color: rgba(94,106,210,0.3);">METHODOLOGY</span>
         <h2>筛选规则与方法论</h2>
       </div>
-      <div class="section-count">dongdong-stock</div>
+      <div class="section-count">基于 dongdong-stock 六阶段A股趋势投资体系（瓶颈理论 + 趋势获利法融合）</div>
     </div>
 
-    
-    <div style="padding:16px 0">
-      <h3 style="margin:0 0 12px">三层筛选体系</h3>
-      <div class="rules-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;margin-bottom:24px">
-        <div class="rule-card">
-          <div class="rule-title">基础准入</div>
-          <ul>
-            <li>市值: 500亿-2000亿优先，<200亿排除</li>
-            <li>PE行业排名后30%优先</li>
-            <li>净利润年均增幅≥30%</li>
-            <li>经营性现金流为正且增长</li>
-            <li>无重大暴雷风险</li>
-          </ul>
+    <div style="max-width: 100%; padding: 0 0 32px 0;">
+      <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-standard); border-radius: 12px; padding: 32px; margin-bottom: 24px;">
+        <h3 style="color: var(--text-primary); font-size: 20px; margin-bottom: 16px;">一、体系总览</h3>
+        <p style="color: var(--text-secondary); line-height: 1.7; margin-bottom: 16px;">
+          本股票池融合<strong style="color: var(--accent-violet);">瓶颈理论</strong>与<strong style="color: var(--accent-violet);">趋势获利法</strong>两大方法论，形成六阶段闭环投资体系：
+        </p>
+        <ul style="color: var(--text-secondary); line-height: 1.8; padding-left: 20px; margin-bottom: 16px;">
+          <li><strong style="color: var(--accent);">瓶颈理论</strong> — 不买龙头，买龙头离不开的公司。五因子模型定位供应链瓶颈节点，解决"去哪里打猎"</li>
+          <li><strong style="color: var(--accent);">趋势获利法</strong> — 顺势而为，波段操作。右侧+V型+五信号确认买入时机，解决"怎么打猎"</li>
+        </ul>
+        <pre style="background: rgba(0,0,0,0.3); padding: 20px; border-radius: 8px; font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--text-secondary); line-height: 1.8; overflow-x: auto;">
+┌─────────────────────────────────────────────────────────┐
+│             A股趋势投资体系完整闭环（六阶段）             │
+├─────────────────────────────────────────────────────────┤
+│  ⓪ 赛道选择 → ① 标的选择 → ② 公司研究 → ③ 起势买入    │
+│  (瓶颈理论)    (三层初筛)    (20问调研)    (右侧+V+五信号)│
+│                              ↕                          │
+│                   ⑤ 综合离场 ← ④ 耐心持有                │
+│                   (基本面+六维)  (四条件闭眼+数据监控)     │
+└─────────────────────────────────────────────────────────┘</pre>
+      </div>
+
+      <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-standard); border-radius: 12px; padding: 32px; margin-bottom: 24px;">
+        <h3 style="color: var(--text-primary); font-size: 20px; margin-bottom: 16px;">二、Phase 0: 赛道选择（瓶颈理论）</h3>
+        <p style="color: var(--text-secondary); line-height: 1.7; margin-bottom: 16px;">
+          <strong style="color: var(--accent);">核心理念：</strong>不买龙头，买龙头离不开的公司。找到供应链中那些虽小但不可或缺的"瓶颈节点"公司。
+        </p>
+
+        <h4 style="color: var(--accent-violet); font-size: 15px; margin: 16px 0 8px;">五因子选择模型</h4>
+        <table class="stock-table" style="margin-bottom: 16px;">
+          <thead><tr><th>因子</th><th>含义</th><th>关键特征</th></tr></thead>
+          <tbody>
+            <tr><td>① 确定性需求</td><td>清晰的宏观趋势驱动持续需求</td><td>AI数据中心扩张、算力需求爆发</td></tr>
+            <tr><td>② 供给受限</td><td>难以复制，进入壁垒高</td><td>长认证周期、高产能壁垒、技术专利保护</td></tr>
+            <tr><td>③ 低关注度</td><td>机构覆盖少，存在认知差</td><td>机构持股低、媒体误解、散户看不懂</td></tr>
+            <tr><td>④ 价值捕获</td><td>能将稀缺性转化为利润</td><td>定价权、客户锁定、供应份额</td></tr>
+            <tr><td>⑤ 催化剂</td><td>近期价值重估触发因素</td><td>财报超预期、客户扩产、政策利好</td></tr>
+          </tbody>
+        </table>
+
+        <h4 style="color: var(--accent-violet); font-size: 15px; margin: 16px 0 8px;">紫苏叶理论（Perilla Leaf Theory）</h4>
+        <p style="color: var(--text-secondary); line-height: 1.7; margin-bottom: 16px;">
+          "一家寿司店最贵的食材是金枪鱼，但最不可或缺的是紫苏叶。" — 寻找那些市值小、流动性低，
+          但在关键制造环节拥有绝对技术垄断的公司。
+        </p>
+
+        <h4 style="color: var(--accent-violet); font-size: 15px; margin: 16px 0 8px;">A股六步选择法</h4>
+        <ol style="color: var(--text-secondary); line-height: 1.8; padding-left: 20px; margin-bottom: 16px;">
+          <li><strong>识别产业周期</strong> — 确定大趋势（如AI算力链）</li>
+          <li><strong>拆解供应链</strong> — 逐层追踪，定位瓶颈节点，筛选"量价齐升"赛道</li>
+          <li><strong>构建五维信号卡</strong> — 对瓶颈节点公司评估五因子</li>
+          <li><strong>真伪过滤</strong> — 排除伪瓶颈（可扩产、可替代、无定价权）</li>
+          <li><strong>多空验证</strong> — 从正反两面论证逻辑</li>
+          <li><strong>输出结论</strong> — 确定是否进入初筛流程</li>
+        </ol>
+
+        <p style="color: var(--text-secondary); font-size: 14px; border-left: 3px solid var(--accent); padding-left: 12px;">
+          Phase 0 产出 → 1-2个高确定性赛道 + 3-5家瓶颈节点公司，进入 Phase 1 基础准入筛选。
+          本股票池当前覆盖 AI 产业链 6 大赛道（AI算力硬件、光通信、液冷、半导体设备、先进封装、AI应用），
+          核心标的均基于瓶颈理论定位。
+        </p>
+      </div>
+
+      <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-standard); border-radius: 12px; padding: 32px; margin-bottom: 24px;">
+        <h3 style="color: var(--text-primary); font-size: 20px; margin-bottom: 16px;">三、第一层：基础准入（入池门槛）</h3>
+        <p style="color: var(--text-secondary); margin-bottom: 16px;">所有标的第一轮筛选，以下四项全部通过才能进入候选池：</p>
+
+        <h4 style="color: var(--accent-violet); font-size: 15px; margin: 16px 0 8px;">① 市值筛选</h4>
+        <table class="stock-table" style="margin-bottom: 16px;">
+          <thead><tr><th>类型</th><th>标准</th><th>理由</th></tr></thead>
+          <tbody>
+            <tr><td><span style="color: var(--success);">优先</span></td><td>500亿 – 2,000亿中盘股</td><td>趋势增长预期更高，区别于短线炒作</td></tr>
+            <tr><td><span style="color: var(--warning);">有条件不选</span></td><td>5,000亿以上大盘股</td><td>盘子大→拉升资金需求高、散户多→上涨动能不足</td></tr>
+            <tr><td><span style="color: var(--danger);">严格远离</span></td><td>200亿以内微盘股、亏损股</td><td>单一主力可用少量资金拉升后"闷杀"散户</td></tr>
+          </tbody>
+        </table>
+
+        <h4 style="color: var(--accent-violet); font-size: 15px; margin: 16px 0 8px;">② 市盈率（PE）</h4>
+        <ul style="color: var(--text-secondary); line-height: 1.8; padding-left: 20px; margin-bottom: 16px;">
+          <li><strong style="color: var(--text-primary);">优先选择：</strong>所在行业板块 PE 排名后 30%（相对低估）</li>
+          <li><strong style="color: var(--success);">"捡宝"信号：</strong>科技热门赛道中 PE &lt; 30 且业绩飞速成长</li>
+          <li><strong style="color: var(--danger);">极高估警戒线：</strong>PE &gt; 300倍（成长预期低，除非业绩暴涨可快速刷低PE）</li>
+        </ul>
+
+        <h4 style="color: var(--accent-violet); font-size: 15px; margin: 16px 0 8px;">③ 业绩增长（两大核心指标）</h4>
+        <table class="stock-table" style="margin-bottom: 16px;">
+          <thead><tr><th>指标</th><th>意义</th><th>优秀标准</th></tr></thead>
+          <tbody>
+            <tr><td><strong>净利润</strong></td><td>账面盈利</td><td>近年持续增长，年均增幅 &ge; 30%；后续有翻倍业绩预期</td></tr>
+            <tr><td><strong>经营性现金流</strong></td><td>经营活动的实际现金流入</td><td>爆炸性增长 = "自我造血"能力强、低杠杆周转、经营/财务风险低</td></tr>
+          </tbody>
+        </table>
+        <p style="color: var(--text-secondary); font-size: 14px;">
+          <strong style="color: var(--success);">关键判断：</strong>净利润+现金流双优 → 成长性极佳，具备价格翻倍潜力。
+          经营性现金流为负 → 需进一步研判其他风险。
+        </p>
+
+        <h4 style="color: var(--accent-violet); font-size: 15px; margin: 16px 0 8px;">④ 重大暴雷风险排除（一票否决）</h4>
+        <ul style="color: var(--text-secondary); line-height: 1.8; padding-left: 20px; margin-bottom: 16px;">
+          <li>⚠️ 债务危机（高资产负债率、短期偿债压力大）</li>
+          <li>⚠️ 财务造假嫌疑（审计报告异常、关联交易复杂）</li>
+          <li>⚠️ 资产减值风险（商誉过高、存货积压）</li>
+          <li>⚠️ 关联方掏空（大股东占用资金、违规担保）</li>
+          <li>⚠️ 内控危机（管理层动荡、信息披露违规）</li>
+        </ul>
+      </div>
+
+      <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-standard); border-radius: 12px; padding: 32px; margin-bottom: 24px;">
+        <h3 style="color: var(--text-primary); font-size: 20px; margin-bottom: 16px;">四、第二层：深度池准入（深度跟踪池，13家）</h3>
+        <p style="color: var(--text-secondary); margin-bottom: 16px;">在通过基础准入的前提下，还需满足以下全部条件才能进入深度跟踪池：</p>
+
+        <table class="stock-table" style="margin-bottom: 16px;">
+          <thead><tr><th>维度</th><th>标准</th><th>说明</th></tr></thead>
+          <tbody>
+            <tr><td>行业龙头属性</td><td>细分赛道排名 Top 1 或 Top 2</td><td>掌握核心技术或稀缺产能，直接受益全球AI算力扩张</td></tr>
+            <tr><td>业绩高弹性</td><td>AI业务季度或年度高增长</td><td>营收趋势向上、毛利率趋势向上、资本开支趋势向上</td></tr>
+            <tr><td>信息可跟踪</td><td>财报、调研纪要、行业数据充分公开</td><td>支持长期深度量化拆解</td></tr>
+            <tr><td>护城河深厚</td><td>至少具备以下 2 项以上</td><td>专利壁垒、自研芯片、独家客户、稀缺产能、短期同业难以追赶</td></tr>
+          </tbody>
+        </table>
+
+        <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: 16px;">
+          <strong style="color: var(--text-primary);">"闭眼"持有四条件</strong>（深度池标的应全部满足）：
+        </p>
+        <ul style="color: var(--text-secondary); line-height: 1.8; padding-left: 20px;">
+          <li>✅ <strong>强产业逻辑</strong> — 处于 AI 产业链核心环节，受益行业趋势</li>
+          <li>✅ <strong>强业绩预期</strong> — 未来 1-2 年业绩高增长确定性高</li>
+          <li>✅ <strong>处于低估状态</strong> — 估值处于历史低位或同业低位</li>
+          <li>✅ <strong>行业市场份额领先</strong> — 细分赛道 Top 3</li>
+        </ul>
+      </div>
+
+      <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-standard); border-radius: 12px; padding: 32px; margin-bottom: 24px;">
+        <h3 style="color: var(--text-primary); font-size: 20px; margin-bottom: 16px;">五、第三层：常规池准入（常规覆盖池，12家）</h3>
+        <p style="color: var(--text-secondary); margin-bottom: 16px;">满足基础准入要求前提下，符合以下任一条件即可纳入常规覆盖池：</p>
+
+        <table class="stock-table" style="margin-bottom: 16px;">
+          <thead><tr><th>条件</th><th>标准</th><th>示例</th></tr></thead>
+          <tbody>
+            <tr><td>细分专精龙头</td><td>细分环节隐形冠军，差异化竞争优势</td><td>安集科技（CMP抛光液）、拓荆科技（薄膜沉积）</td></tr>
+            <tr><td>增量弹性标</td><td>传统业务稳定，AI新业务高速起量</td><td>长电科技（AI先进封装起量）</td></tr>
+            <tr><td>产业链配套核心</td><td>上游材料、设备、中游配套、下游垂直落地</td><td>光迅科技（光模块配套）、中科曙光（算力底座）</td></tr>
+            <tr><td>潜在成长标的</td><td>技术路线领先，1-2年有望进入深度池</td><td>拓荆科技、安集科技（待规模放大）</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-standard); border-radius: 12px; padding: 32px; margin-bottom: 24px;">
+        <h3 style="color: var(--text-primary); font-size: 20px; margin-bottom: 16px;">六、动态调出机制</h3>
+        <p style="color: var(--text-secondary); margin-bottom: 16px;">以下任一条件触发，标的将被调出当前层级或完全出池：</p>
+
+        <table class="stock-table" style="margin-bottom: 16px;">
+          <thead><tr><th>场景</th><th>触发条件</th><th>行动</th></tr></thead>
+          <tbody>
+            <tr><td>逻辑证伪</td><td>核心壁垒消失 / AI业务持续不及预期 / 商业化进度长期滞后</td><td>立即调出</td></tr>
+            <tr><td>景气下行</td><td>Capex连续两季度高于需求增速 / 赛道需求拐点明确向下</td><td>缩减覆盖或出池</td></tr>
+            <tr><td>层级升降</td><td>常规池→深度池：持续兑现业绩、龙头地位稳固<br>深度池→常规池：增长放缓、逻辑弱化</td><td>双向流动</td></tr>
+            <tr><td>赛道迭代</td><td>新技术/新环节崛起 / 落后路线企业</td><td>同步纳入或淘汰</td></tr>
+          </tbody>
+        </table>
+
+        <h4 style="color: var(--accent-violet); font-size: 15px; margin: 20px 0 8px;">量化触发条件（自动化监控）</h4>
+        <p style="color: var(--text-secondary); margin-bottom: 12px;">以下量化指标将通过周更新cron job自动扫描，引发警报后人工复核：</p>
+        <table class="stock-table" style="margin-bottom: 16px;">
+          <thead><tr><th>触发条件</th><th>标准</th><th>行动</th></tr></thead>
+          <tbody>
+            <tr><td>净利润增速连续两季 < 15%</td><td>深度池标的应保持高增长确定性</td><td>触发降级讨论</td></tr>
+            <tr><td>市值连续一周稳定低于200亿</td><td>严格基础准入门槛</td><td>自动降级至观察池</td></tr>
+            <tr><td>PE > 所属赛道均值2倍以上</td><td>无合理解释时触发</td><td>标记为"关注级"</td></tr>
+            <tr><td>核心客户关系变化</td><td>供应链脱钩、主要客户自研替代</td><td>立即出池评估</td></tr>
+            <tr><td>核心指标连续两期为"—"（数据缺失）</td><td>信息可跟踪性不足</td><td>降级至常规池或观察池</td></tr>
+          </tbody>
+        </table>
+        <p style="color: var(--text-secondary); font-size: 14px;">注：量化触发只是提示信号，最终决策需人工复核业务逻辑后做出。</p>
+      </div>
+
+      <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-standard); border-radius: 12px; padding: 32px;">
+        <h3 style="color: var(--text-primary); font-size: 20px; margin-bottom: 16px;">七、更新维护规则</h3>
+        
+        <h4 style="color: var(--accent-violet); font-size: 15px; margin: 16px 0 8px;">7.1 每周六 20:00 自动更新流程</h4>
+        <pre style="background: rgba(0,0,0,0.3); padding: 20px; border-radius: 8px; font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--text-secondary); line-height: 1.8; overflow-x: auto;">
+Step 1: 检查现有持仓标的的基本面变化
+  └─ 执行"动态调出检查"全部项目（逻辑证伪/景气下行/层级升降/赛道迭代）
+
+Step 2: 初筛新候选标的
+  └─ 执行"基础准入检查"全部项目（市值/PE/业绩/暴雷）
+
+Step 3: 对通过初筛的标的执行深度池/常规池准入检查
+
+Step 4: 对新增深度池标的执行20问AI调研
+  └─ 产业逻辑（Q1-Q7）：主营业务、护城河、产业链位置、竞争地位、定价能力、客户结构、行业趋势
+  └─ 业绩增长（Q8-Q13）：盈利水平、公司治理、毛利率、增长驱动力、风险识别、业绩预测
+  └─ 估值水平（Q14-Q18）：估值方法、历史分位、同业对比、隐含预期、估值催化剂
+  └─ 总结决策（Q19-Q20）：核心框架提炼、投资建议（卓越/优秀/平庸/毁灭型）
+
+Step 5: 生成入池研报
+  └─ 财务数据（市值/PE/净利润增速/现金流）
+  └─ 核心逻辑（3-5条）
+  └─ 风险提示（2-3条）
+  └─ 跟踪变量（1-2个）
+
+Step 6: 更新股票池清单和层级
+  └─ 调出证伪标的 / 升级兑现标的 / 降级弱化标的
+
+Step 7: 输出本周更新摘要</pre>
+
+        <h4 style="color: var(--accent-violet); font-size: 15px; margin: 16px 0 8px;">7.2 日常管理</h4>
+        <table class="stock-table" style="margin-bottom: 16px;">
+          <thead><tr><th>频率</th><th>检查项</th><th>内容</th></tr></thead>
+          <tbody>
+            <tr><td>每日</td><td>量价关系扫描</td><td>收盘价变动 >5%、成交量异常、板块排名、大盘环境</td></tr>
+            <tr><td>每周</td><td>基本面检视</td><td>业绩预警/订单变化/管理层变动、行业景气度、竞争对手动态、估值变化、技术面趋势</td></tr>
+            <tr><td>每月</td><td>全面评估</td><td>财报更新核验、估值水平重估、持仓集中度、整体仓位、股票池更新</td></tr>
+          </tbody>
+        </table>
+
+        <h4 style="color: var(--accent-violet); font-size: 15px; margin: 16px 0 8px;">7.3 风险提示字段规范</h4>
+        <p style="color: var(--text-secondary); margin-bottom: 12px;">
+          每张股票卡片均需包含"风险提示"字段，内容要求：
+        </p>
+        <ul style="color: var(--text-secondary); line-height: 1.8; padding-left: 20px; margin-bottom: 16px;">
+          <li>切实有效的风险，避免大而无当的模式词（如"市场风险"）</li>
+          <li>优先指向该标的独有的风险点（客户集中、周期性、制裁、估值等）</li>
+          <li>每条风险应有可观测的信号（可用于触发调出判断）</li>
+        </ul>
+
+        <h4 style="color: var(--accent-violet); font-size: 15px; margin: 16px 0 8px;">八、观察池说明</h4>
+        <p style="color: var(--text-secondary); line-height: 1.7;">
+          观察池（Watch List）是 2026-06-22 重新筛选后新增的层级，用于容纳<strong style="color: var(--warning);">不符合基础准入条件但有潜在关注价值</strong>的标的。
+          当前 7 家公司主要因以下原因进入观察池：
+        </p>
+        <ul style="color: var(--text-secondary); line-height: 1.8; padding-left: 20px; margin: 12px 0;">
+          <li><strong>市值不达标</strong>（<500亿）：恒生电子（397亿）、德赛西威（471亿）、中科创达（273亿）— 待业务规模放大后重新评估</li>
+          <li><strong>持续亏损</strong>：寒武纪（市值9,160亿）、科大讯飞、北方稀土 — 待扭亏后重新评估</li>
+          <li><strong>竞争格局恶化</strong>：科沃斯 — 待行业格局企稳、利润重回增长后评估</li>
+        </ul>
+        <p style="color: var(--text-secondary); font-size: 14px; margin-top: 12px;">
+          观察池标的<strong style="color: var(--text-primary);">不纳入每周六的自动维护流程</strong>，但会在每月全面评估时进行跟踪，条件满足后重新申请入池。
+        </p>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+      <div class="footer-inner">
+        <div class="footer-left">
+          <span class="update-badge">自动更新已启用</span>
+          <span style="margin-left: 12px;">每周六 20:00 自动更新池子状态</span>
         </div>
-        <div class="rule-card">
-          <div class="rule-title">深度池准入</div>
-          <ul>
-            <li>细分赛道Top1或Top2</li>
-            <li>掌握核心技术/稀缺产能</li>
-            <li>直接受益全球AI算力扩张</li>
-            <li>产业链话语权强</li>
-            <li>护城河深厚(专利/客户/产能)</li>
-          </ul>
-        </div>
-        <div class="rule-card">
-          <div class="rule-title">常规池准入</div>
-          <ul>
-            <li>细分专精龙头/隐形冠军</li>
-            <li>传统业务稳定+AI新业务起量</li>
-            <li>产业链配套核心</li>
-            <li>潜在成长标的(1-2年有望升深度)</li>
-          </ul>
+        <div class="footer-right">
+          <a href="#">研报文件</a>
+          <a href="#">更新日志</a>
+          <a href="#">设置</a>
         </div>
       </div>
-      <h3 style="margin:0 0 12px">动态调出机制</h3>
-      <ul>
-        <li><strong>逻辑证伪</strong> — 核心壁垒消失/AI业务不及预期 → 调出</li>
-        <li><strong>景气下行</strong> — 赛道需求拐点明确向下 → 出池</li>
-        <li><strong>层级升降</strong> — 业绩兑现升深度/增长放缓降常规</li>
-        <li><strong>赛道迭代</strong> — 新技术崛起纳入/落后路线淘汰</li>
-      </ul>
-      <p style="margin-top:16px;font-size:12px;color:var(--text-muted)">方法论来源: dongdong-stock A股趋势投资体系 | 数据来源: 东方财富/腾讯行情</p>
-    </div>
-    
+    </footer>
   </main>
-</div><script>
-document.addEventListener("DOMContentLoaded", function(){
-  fetch("https://api.visitorbadge.io/api/visitors?path=https://hex623.github.io/beibei-stock/&countColor=%23263759")
-    .then(r=>r.json()).then(d => {
-      document.getElementById("visitorCount").textContent = d.count || "--";
-    }).catch(() => {});
-  document.querySelectorAll(".filter-btn").forEach(b => {
-    b.addEventListener("click", function(){
-      document.querySelectorAll(".filter-btn").forEach(x => x.classList.remove("active"));
-      this.classList.add("active");
-      const f = this.dataset.filter;
-      document.querySelectorAll(".stock-card").forEach(c => {
-        c.classList.toggle("hidden", f !== "all" && c.dataset.category && c.dataset.category !== "observe" && c.dataset.category !== f);
+
+  <script>
+    // Filter functionality
+    const filterBtns = document.querySelectorAll('.filter-btn');
+    const stockCards = document.querySelectorAll('.stock-card');
+
+    filterBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        filterBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        const filter = btn.dataset.filter;
+        stockCards.forEach(card => {
+          if (filter === 'all' || card.dataset.category === filter) {
+            card.style.display = 'block';
+          } else {
+            card.style.display = 'none';
+          }
+        });
       });
     });
-  });
-  document.querySelectorAll(".view-btn").forEach(b => {
-    b.addEventListener("click", function(){
-      document.querySelectorAll(".view-btn").forEach(x => x.classList.remove("active"));
-      this.classList.add("active");
-      const v = this.dataset.view;
-      document.querySelectorAll(".stock-grid").forEach(g => {
-        g.classList.toggle("list-view", v === "table");
+
+    // View toggle
+    const viewBtns = document.querySelectorAll('.view-btn');
+    const gridContainer = document.getElementById('deep-grid');
+    const tableContainer = document.getElementById('deep-table');
+
+    viewBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        viewBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        const view = btn.dataset.view;
+        if (view === 'grid') {
+          gridContainer.classList.remove('hidden');
+          tableContainer.classList.remove('active');
+        } else {
+          gridContainer.classList.add('hidden');
+          tableContainer.classList.add('active');
+        }
       });
     });
-  });
-});
-</script>
+
+    // Smooth scroll for nav links
+    document.querySelectorAll('.nav-links a').forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const target = document.querySelector(link.getAttribute('href'));
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    });
+  </script>
+</body>
+</html>
